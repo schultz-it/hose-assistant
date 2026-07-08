@@ -63,6 +63,43 @@ async def root() -> str:
 <a href="api/ha/entities">HA entities</a></p>
 <p><button onclick="refreshBal()">Refresh balance from Open-Meteo</button>
 <span id="balmsg"></span></p>
+<h3>Zones</h3>
+<div id="zlist">loading…</div>
+<p>name <input id="zname" size="12" placeholder="Front lawn">
+valve <input id="zvalve" size="28" list="entities"
+  placeholder="input_boolean.zona_1_test">
+<datalist id="entities"></datalist>
+<button onclick="addZone()">Add zone</button> <span id="zmsg"></span></p>
+<script>
+function loadZones(){
+  fetch('api/zones').then(r=>r.json()).then(zs=>{
+    zlist.innerHTML = zs.length ? zs.map(z=>
+      '#'+z.id+' <b>'+z.name+'</b> → '+z.valve_entity+
+      ' <button onclick="delZone('+z.id+')">✕</button>').join('<br>')
+      : '<i>no zones yet</i>';
+  });
+}
+function addZone(){
+  zmsg.textContent='saving…';
+  fetch('api/zones',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({name:zname.value,valve_entity:zvalve.value})})
+  .then(r=>{if(!r.ok) throw r.status; return r.json();})
+  .then(()=>{zmsg.textContent='ok';zname.value='';loadZones();})
+  .catch(e=>{zmsg.textContent='error: '+e;});
+}
+function delZone(id){
+  fetch('api/zones/'+id,{method:'DELETE'}).then(loadZones);
+}
+loadZones();
+// entity autocomplete: mock valves first, then real switches
+Promise.all([
+  fetch('api/ha/entities?domain=input_boolean').then(r=>r.json()).catch(()=>({entities:[]})),
+  fetch('api/ha/entities?domain=switch').then(r=>r.json()).catch(()=>({entities:[]})),
+]).then(([a,b])=>{
+  document.getElementById('entities').innerHTML =
+    [...a.entities,...b.entities].map(e=>'<option value="'+e.entity_id+'">').join('');
+});
+</script>
 <h3>Engine &amp; executor</h3>
 <p><a href="api/schedule">schedule</a> · <a href="api/log">event log</a></p>
 <p><button onclick="recalc()">Recalc plan now</button> <span id="recmsg"></span></p>

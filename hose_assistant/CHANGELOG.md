@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.1
+- Dev page: zone management (list/add/delete) with valve-entity autocomplete
+  from HA (input_boolean mocks first, then switches).
+
 ## 0.4.0
 - Calculation engine (Milestone 4): per-zone water-balance deficit chain
   (ET0 x Kc_eff x intensity x program multiplier - effective rain - irrigation,
