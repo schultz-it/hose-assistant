@@ -31,7 +31,7 @@ hose-assistant/                    ← repo root, ready to publish on GitHub
 ├── .github/workflows/build.yaml   ← multi-arch build via home-assistant/builder
 └── hose_assistant/                ← the add-on
     ├── config.yaml                ← manifest: ingress on 8099, hassio_api, homeassistant_api, options schema
-    ├── build.yaml                 ← HA base images (alpine 3.19) for aarch64/amd64/armv7
+    ├── build.yaml                 ← HA base images (alpine 3.19) for aarch64/amd64 (armv7 dropped by HA in 2026)
     ├── Dockerfile                 ← installs python3 + requirements, copies backend/frontend/rootfs
     ├── DOCS.md                    ← stub
     ├── CHANGELOG.md               ← 0.1.0

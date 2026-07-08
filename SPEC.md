@@ -92,7 +92,7 @@ hose-assistant/                     # repository root (also the add-on repo)
 │       │   ├── components/         # sliders, cards, gauges, entity pickers
 │       │   └── i18n/               # mirrors backend catalogs
 │       └── vite.config.js
-└── .github/workflows/build.yaml    # multi-arch image build (aarch64, amd64, armv7)
+└── .github/workflows/build.yaml    # multi-arch image build (aarch64, amd64)
 ```
 
 ---
@@ -105,7 +105,7 @@ version: "1.0.0"
 slug: hose_assistant
 description: Smart irrigation calculator & controller — ET-based, weather-aware, AI-assisted.
 url: https://github.com/<owner>/hose-assistant
-arch: [aarch64, amd64, armv7]
+arch: [aarch64, amd64]  # armv7 (32-bit) dropped by HA in 2026
 init: false
 ingress: true
 ingress_port: 8099

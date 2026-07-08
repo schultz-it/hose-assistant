@@ -11,8 +11,9 @@ jobs:
     name: Build ${{ matrix.arch }}
     runs-on: ubuntu-latest
     strategy:
+      # armv7 (32-bit) was dropped by Home Assistant and its builder in 2026.
       matrix:
-        arch: [aarch64, amd64, armv7]
+        arch: [aarch64, amd64]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
