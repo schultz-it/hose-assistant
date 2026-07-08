@@ -46,13 +46,11 @@ hose-assistant/                    ← repo root, ready to publish on GitHub
 
 **Milestone status: Milestone 1 is scaffolded but NOT yet tested on a real HA instance.** Everything else (Milestones 2–10, see SPEC §12) is not started.
 
+**Repo published (2026-07-08):** public at **https://github.com/schultz-it/hose-assistant**, default branch `main`, initial commit `Initial scaffold: Milestone 1 skeleton`. Git identity: Andrea Brunelli <andrea@imballaggibrunelli.it>. `gh` CLI authenticated as `schultz-it` (scopes incl. `repo`, `workflow`) with git credential helper configured.
+
 ## Immediate next steps (in order)
 
-1. **Publish the repo**: replace `YOUR_GITHUB_USERNAME` in `README.md` and `repository.yaml`, then:
-   ```bash
-   git init && git add -A && git commit -m "Initial scaffold: Milestone 1 skeleton"
-   gh repo create hose-assistant --public --source=. --push
-   ```
+1. ~~**Publish the repo**~~ — ✅ done. Repo live at https://github.com/schultz-it/hose-assistant.
 2. **Test Milestone 1 on HA**: add the GitHub repo URL in HA (Settings → Add-ons → Repositories), install Hose Assistant, start it, open the sidebar panel → expect the hello page; click "Test Supervisor API" → expect a JSON list of `switch.*` entities.
    - Faster dev loop alternative: copy the `hose_assistant/` add-on folder into HA's `/addons` local directory via Samba and use "Local add-ons".
 3. **Known Milestone 1 gaps to close before calling it done**:
