@@ -21,7 +21,11 @@ jobs:
       - name: Build ${{ matrix.arch }} add-on
         uses: home-assistant/builder@master
         with:
+          # --test builds locally without pushing; --image/--docker-hub only
+          # provide a valid tag name (the builder fails on an empty image name).
           args: |
             --${{ matrix.arch }} \
             --target hose_assistant \
+            --image "hose-assistant-{arch}" \
+            --docker-hub "ghcr.io/schultz-it" \
             --test
