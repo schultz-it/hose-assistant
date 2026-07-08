@@ -19,7 +19,7 @@ from . import models  # noqa: F401  (import registers the ORM models on Base)
 from .api import config, programs, runs, weather, zones
 from .core import scheduler as sched
 from .core.executor import executor
-from .db import Base, SessionLocal, engine
+from .db import Base, SessionLocal, apply_migrations, engine
 
 SUPERVISOR = "http://supervisor/core/api"
 TOKEN = os.environ.get("SUPERVISOR_TOKEN", "")
@@ -29,6 +29,7 @@ TOKEN = os.environ.get("SUPERVISOR_TOKEN", "")
 async def lifespan(app: FastAPI):
     """Startup: tables, singleton config, scheduler, close-all clean slate."""
     Base.metadata.create_all(bind=engine)
+    apply_migrations()
     with SessionLocal() as db:
         if db.get(models.SystemConfig, 1) is None:
             db.add(models.SystemConfig(id=1))

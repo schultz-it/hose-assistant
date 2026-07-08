@@ -33,3 +33,25 @@ def get_db():
         yield db
     finally:
         db.close()
+
+
+# Columns added after a table first shipped: (table, column, DDL type+default).
+# SQLite's create_all() does not ALTER existing tables, so upgrades from older
+# versions need these applied manually at startup (idempotent).
+_MIGRATIONS: list[tuple[str, str, str]] = [
+    ("zones", "emitter_lh", "FLOAT"),
+    ("zones", "emitter_spacing_cm", "FLOAT"),
+    ("zones", "line_length_m", "FLOAT"),
+    ("zones", "cover", "VARCHAR DEFAULT 'none'"),
+]
+
+
+def apply_migrations() -> None:
+    """Add any missing columns to existing tables (SQLite ALTER ADD COLUMN)."""
+    from sqlalchemy import text
+
+    with engine.begin() as conn:
+        for table, column, ddl in _MIGRATIONS:
+            cols = [r[1] for r in conn.execute(text(f"PRAGMA table_info({table})"))]
+            if cols and column not in cols:
+                conn.execute(text(f"ALTER TABLE {table} ADD COLUMN {column} {ddl}"))

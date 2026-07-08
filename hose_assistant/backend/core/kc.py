@@ -19,6 +19,19 @@ KC_MONTHLY: dict[str, list[float]] = {
 # Default slider position implied by each shade preset.
 PRESET_FINE: dict[str, int] = {"full_sun": 0, "partial": 40, "shade": 80}
 
+# Soil cover: mulch reduces evaporation (Kc factor); plastic film also keeps
+# most rainfall out of the root zone (rain factor, used by the engine).
+COVER_KC: dict[str, float] = {"none": 1.0, "organic_mulch": 0.85, "plastic_mulch": 0.75}
+COVER_RAIN: dict[str, float] = {"none": 1.0, "organic_mulch": 1.0, "plastic_mulch": 0.3}
+
+
+def cover_kc_factor(zone) -> float:
+    return COVER_KC.get(getattr(zone, "cover", "none") or "none", 1.0)
+
+
+def cover_rain_factor(zone) -> float:
+    return COVER_RAIN.get(getattr(zone, "cover", "none") or "none", 1.0)
+
 
 def shade_factor(zone, month: int) -> float:
     """Shade factor in [0.5, 1.0] for a zone in a given month (1-12)."""
@@ -30,4 +43,4 @@ def shade_factor(zone, month: int) -> float:
 def kc_eff(zone, month: int) -> float:
     """Effective crop coefficient for a zone in a given month (1-12)."""
     kc = KC_MONTHLY[zone.grass_type][month - 1]
-    return round(kc * shade_factor(zone, month), 3)
+    return round(kc * shade_factor(zone, month) * cover_kc_factor(zone), 3)

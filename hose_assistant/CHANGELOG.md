@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.5.1
+- Richer irrigation types: fixed spray, rotor, MP rotator, micro-spray,
+  surface drip, buried drip (soaker hose ≈ drip; tree bubblers ≈ high-flow
+  drip; oscillating ≈ spray).
+- Drip rate calculator in the zone editor: dripline length × emitter flow ÷
+  spacing ÷ area → mm/h, one tap to apply.
+- New "soil cover" per zone: bare / organic mulch / plastic film. Mulch
+  lowers evaporation (Kc ×0.85 / ×0.75); plastic film also blocks most rain
+  from the root zone (effective rain ×0.3).
+- Automatic SQLite column migration for existing installs.
+
 ## 0.5.0
 - Web UI (Milestone 5): mobile-first Preact + Tailwind SPA with bottom tab bar,
   dark/light theme, served at the panel root (dev page moved to /dev).

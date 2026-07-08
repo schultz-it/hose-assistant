@@ -4,16 +4,31 @@ import { t } from "../i18n.js";
 import { Card, Field, inputCls, btnCls, btnGray } from "../app.jsx";
 
 // Default precipitation rate per irrigation type (SPEC 5.2).
-const PR_DEFAULT = { spray: 35, rotor: 15, mp_rotator: 10, drip: 6 };
+const PR_DEFAULT = {
+  spray: 35, rotor: 15, mp_rotator: 10, microspray: 20,
+  drip: 6, subsurface_drip: 6,
+};
 const ROOT_DEFAULT = { cool_season: 15, warm_season: 20, shrubs_drip: 30 };
 const SHADE_FINE = { full_sun: 0, partial: 40, shade: 80 };
+const COVERS = ["none", "organic_mulch", "plastic_mulch"];
+const isDrip = (t) => t === "drip" || t === "subsurface_drip";
 
 const EMPTY = {
   name: "", valve_entity: "", irrigation_type: "spray",
-  precipitation_rate_mmh: 35, soil_type: "loam", grass_type: "cool_season",
-  root_depth_cm: 15, area_m2: null, slope: "flat", shade_preset: "full_sun",
-  shade_fine: 0, max_runtime_min: 60, enabled: true, order: 0,
+  precipitation_rate_mmh: 35, emitter_lh: null, emitter_spacing_cm: null,
+  line_length_m: null, cover: "none", soil_type: "loam",
+  grass_type: "cool_season", root_depth_cm: 15, area_m2: null, slope: "flat",
+  shade_preset: "full_sun", shade_fine: 0, max_runtime_min: 60,
+  enabled: true, order: 0,
 };
+
+// Drip calculator: dripline length x emitter flow / spacing / wetted area.
+function dripRate(z) {
+  const { line_length_m: L, emitter_lh: q, emitter_spacing_cm: s, area_m2: A } = z;
+  if (!L || !q || !s || !A) return null;
+  const emitters = L / (s / 100);
+  return Math.round((emitters * q / A) * 10) / 10; // mm/h == L/h per m2
+}
 
 export function Zones() {
   const [zones, setZones] = useState(null);
@@ -49,11 +64,15 @@ export function Zones() {
   async function save() {
     setMsg("…");
     try {
+      const numOrNull = (v) => (v != null && v !== "" ? parseFloat(v) : null);
       const body = {
         ...editing,
         precipitation_rate_mmh: parseFloat(editing.precipitation_rate_mmh),
         root_depth_cm: parseFloat(editing.root_depth_cm),
-        area_m2: editing.area_m2 != null ? parseFloat(editing.area_m2) : null,
+        area_m2: numOrNull(editing.area_m2),
+        emitter_lh: numOrNull(editing.emitter_lh),
+        emitter_spacing_cm: numOrNull(editing.emitter_spacing_cm),
+        line_length_m: numOrNull(editing.line_length_m),
         shade_fine: parseInt(editing.shade_fine),
         max_runtime_min: parseInt(editing.max_runtime_min),
         order: parseInt(editing.order || 0),
@@ -96,6 +115,13 @@ export function Zones() {
             <input class={inputCls} type="number" step="0.5"
               value={editing.precipitation_rate_mmh} onInput={set("precipitation_rate_mmh")} />
           </Field>
+          <Field label={t("zones.cover")}>
+            <select class={inputCls} value={editing.cover} onInput={set("cover")}>
+              {COVERS.map((k) => (
+                <option key={k} value={k}>{t(`zones.cover.${k}`)}</option>
+              ))}
+            </select>
+          </Field>
           <Field label={t("zones.soil")}>
             <select class={inputCls} value={editing.soil_type} onInput={set("soil_type")}>
               {["sandy", "loam", "clay"].map((k) => (
@@ -130,6 +156,36 @@ export function Zones() {
               onInput={set("max_runtime_min")} />
           </Field>
         </div>
+        {isDrip(editing.irrigation_type) && (
+          <div class="rounded-lg border border-dashed border-gray-300 dark:border-gray-700 p-3 mb-3">
+            <div class="text-sm font-medium mb-2">{t("zones.drip_calc")}</div>
+            <div class="grid grid-cols-3 gap-2">
+              <Field label={t("zones.drip_line")}>
+                <input class={inputCls} type="number" step="0.5"
+                  value={editing.line_length_m ?? ""} onInput={set("line_length_m")} />
+              </Field>
+              <Field label={t("zones.drip_spacing")}>
+                <input class={inputCls} type="number" step="1"
+                  value={editing.emitter_spacing_cm ?? ""} onInput={set("emitter_spacing_cm")} />
+              </Field>
+              <Field label={t("zones.drip_flow")}>
+                <input class={inputCls} type="number" step="0.1"
+                  value={editing.emitter_lh ?? ""} onInput={set("emitter_lh")} />
+              </Field>
+            </div>
+            {dripRate(editing) != null ? (
+              <button
+                class="text-sm text-emerald-600 dark:text-emerald-400 underline"
+                onClick={() =>
+                  setEditing((p) => ({ ...p, precipitation_rate_mmh: dripRate(p) }))
+                }>
+                {t("zones.drip_apply")} → {dripRate(editing)} mm/h
+              </button>
+            ) : (
+              <span class="text-xs text-gray-500">{t("zones.drip_hint")}</span>
+            )}
+          </div>
+        )}
         <Field label={t("zones.shade")}>
           <div class="flex gap-2 mb-2">
             {Object.keys(SHADE_FINE).map((k) => (

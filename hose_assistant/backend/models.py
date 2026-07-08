@@ -48,6 +48,12 @@ class Zone(Base):
     order: Mapped[int] = mapped_column(Integer, default=0)
     irrigation_type: Mapped[str] = mapped_column(String, default="spray")
     precipitation_rate_mmh: Mapped[float] = mapped_column(Float, default=35.0)
+    # Drip calculator inputs (optional; drip/subsurface types only)
+    emitter_lh: Mapped[float | None] = mapped_column(Float, nullable=True)
+    emitter_spacing_cm: Mapped[float | None] = mapped_column(Float, nullable=True)
+    line_length_m: Mapped[float | None] = mapped_column(Float, nullable=True)
+    # Soil cover over the root zone: affects evaporation AND effective rain
+    cover: Mapped[str] = mapped_column(String, default="none")
     soil_type: Mapped[str] = mapped_column(String, default="loam")
     grass_type: Mapped[str] = mapped_column(String, default="cool_season")
     root_depth_cm: Mapped[float] = mapped_column(Float, default=15.0)

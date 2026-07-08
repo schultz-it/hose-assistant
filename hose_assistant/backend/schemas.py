@@ -13,7 +13,10 @@ from pydantic import BaseModel, ConfigDict, Field
 
 # --- Enum-like value sets (SPEC section 5) ---
 Units = Literal["metric", "imperial"]
-IrrigationType = Literal["spray", "rotor", "mp_rotator", "drip"]
+IrrigationType = Literal[
+    "spray", "rotor", "mp_rotator", "microspray", "drip", "subsurface_drip"
+]
+Cover = Literal["none", "organic_mulch", "plastic_mulch"]
 SoilType = Literal["sandy", "loam", "clay"]
 GrassType = Literal["cool_season", "warm_season", "shrubs_drip"]
 Slope = Literal["flat", "gentle", "steep"]
@@ -73,6 +76,10 @@ class ZoneCreate(BaseModel):
     order: int = 0
     irrigation_type: IrrigationType = "spray"
     precipitation_rate_mmh: float = Field(35.0, gt=0)
+    emitter_lh: Optional[float] = Field(default=None, gt=0)
+    emitter_spacing_cm: Optional[float] = Field(default=None, gt=0)
+    line_length_m: Optional[float] = Field(default=None, gt=0)
+    cover: Cover = "none"
     soil_type: SoilType = "loam"
     grass_type: GrassType = "cool_season"
     root_depth_cm: float = Field(15.0, gt=0)
@@ -95,6 +102,10 @@ class ZoneUpdate(BaseModel):
     order: Optional[int] = None
     irrigation_type: Optional[IrrigationType] = None
     precipitation_rate_mmh: Optional[float] = Field(default=None, gt=0)
+    emitter_lh: Optional[float] = Field(default=None, gt=0)
+    emitter_spacing_cm: Optional[float] = Field(default=None, gt=0)
+    line_length_m: Optional[float] = Field(default=None, gt=0)
+    cover: Optional[Cover] = None
     soil_type: Optional[SoilType] = None
     grass_type: Optional[GrassType] = None
     root_depth_cm: Optional[float] = Field(default=None, gt=0)

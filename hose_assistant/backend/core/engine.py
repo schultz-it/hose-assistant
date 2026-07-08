@@ -70,8 +70,9 @@ def update_deficits(db: Session, cfg: models.SystemConfig) -> None:
             program = active_program(db, date.fromisoformat(row.date))
             et_mult = program.et_multiplier if program else 1.0
             et_loss = (row.et0 or 0.0) * (row.kc_eff or 0.0) * cfg.watering_intensity * et_mult
-            # SPEC: effective rain = min(rain, infiltration capacity)
-            eff_rain = min(row.rain_mm or 0.0, infil)
+            # SPEC: effective rain = min(rain, infiltration capacity) x cover
+            # factor (plastic film keeps most rainfall out of the root zone).
+            eff_rain = min(row.rain_mm or 0.0, infil) * kc.cover_rain_factor(zone)
             deficit = max(0.0, min(taw, deficit + et_loss - eff_rain - (row.irrigated_mm or 0.0)))
             row.deficit_mm = round(deficit, 2)
     db.flush()

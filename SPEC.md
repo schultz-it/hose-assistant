@@ -158,8 +158,10 @@ All units metric internally; UI converts if user selects imperial.
 | valve_entity | str | required — `switch.*` or `valve.*` |
 | enabled | bool | |
 | order | int | sequencing position |
-| irrigation_type | enum | `spray` (default PR 35 mm/h) · `rotor` (15) · `mp_rotator` (10) · `drip` (6) |
-| precipitation_rate_mmh | float | prefilled from type, editable |
+| irrigation_type | enum | `spray` (default PR 35 mm/h, catalog PR of fixed heads covers the whole area) · `rotor` (15, catalog PR already accounts for the moving jet) · `mp_rotator` (10) · `microspray` (20) · `drip` (6, surface dripline) · `subsurface_drip` (6, buried dripline). Equivalents documented: soaker hose ≈ drip, tree bubblers ≈ high-flow drip, oscillating ≈ spray |
+| precipitation_rate_mmh | float | prefilled from type, editable; for drip types the UI computes it from dripline length × emitter flow ÷ emitter spacing ÷ area |
+| emitter_lh, emitter_spacing_cm, line_length_m | float? | drip calculator inputs (optional, drip types only) |
+| **cover** | enum | soil cover over the root zone: `none` (Kc ×1.0, rain ×1.0) · `organic_mulch` (Kc ×0.85, rain ×1.0) · `plastic_mulch` (Kc ×0.75, rain ×0.3 — film blocks most rainfall from the roots) |
 | soil_type | enum | `sandy` (AWC 0.06 mm/mm, infil 25 mm/h) · `loam` (0.12, 12) · `clay` (0.17, 4) |
 | grass_type | enum | `cool_season` (Kc table peaks 0.95, root 15 cm) · `warm_season` (peaks 0.75, root 20 cm) · `shrubs_drip` |
 | root_depth_cm | float | prefilled, editable |
@@ -173,7 +175,8 @@ All units metric internally; UI converts if user selects imperial.
 | rain_sensor_entity | str? | optional binary sensor; ON ⇒ skip |
 | max_runtime_min | int | hard cap per session (failsafe), default 60 |
 
-**Effective crop coefficient**: `Kc_eff = Kc_month(grass) × shade_factor(month)`.
+**Effective crop coefficient**: `Kc_eff = Kc_month(grass) × shade_factor(month) × cover_factor`.
+**Effective rain** additionally multiplies by the cover's rain factor (plastic film keeps rain out of the root zone).
 
 ### 5.3 Program (the 4 seasonal modes; user can add more)
 | Field | Type | Notes |
