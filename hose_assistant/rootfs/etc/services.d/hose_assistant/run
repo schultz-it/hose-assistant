@@ -1,0 +1,7 @@
+#!/usr/bin/with-contenv bashio
+bashio::log.info "Starting Hose Assistant..."
+export LOG_LEVEL=$(bashio::config 'log_level')
+export AI_PROVIDER=$(bashio::config 'ai_provider')
+export AI_API_KEY=$(bashio::config 'ai_api_key')
+cd /app
+exec python3 -m uvicorn backend.main:app --host 0.0.0.0 --port 8099

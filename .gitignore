@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+
+# Node / frontend build
+node_modules/
+hose_assistant/frontend/dist/*
+!hose_assistant/frontend/dist/.gitkeep
+
+# Local data / DB
+*.db
+data/
+
+# macOS
+.DS_Store
+
+# Editors
+.vscode/
+.idea/
