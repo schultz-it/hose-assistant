@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.4.0
+- Calculation engine (Milestone 4): per-zone water-balance deficit chain
+  (ET0 x Kc_eff x intensity x program multiplier - effective rain - irrigation,
+  clamped to [0, TAW]), MAD trigger, runtime from precipitation rate,
+  cycle & soak for steep/low-infiltration zones, window packing with
+  proportional reduction, seasonal program selection with priorities.
+- Valve executor with hard failsafes: persisted watchdog turn-off on every
+  valve open (survives restarts), close-all on startup, abort + close-all on
+  HA API errors, strict one-zone-at-a-time sequencing, master valve support.
+- APScheduler (SQLite job store in /data): daily calc at the configured time,
+  automatic execution at the program window.
+- New endpoints: GET /api/schedule, POST /api/schedule/{id}/skip,
+  POST /api/run/zone/{id}?minutes=, POST /api/run/program/{id},
+  POST /api/stop_all, POST /api/engine/recalc, GET /api/log.
+- Dev page: recalc / run-zone / STOP ALL controls, schedule + log links.
+
 ## 0.3.0
 - Weather + sun (Milestone 3): Open-Meteo client (daily FAO-56 ET0 +
   precipitation, past 7 days actuals + 7-day forecast), automatic elevation

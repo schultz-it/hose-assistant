@@ -41,7 +41,7 @@ async def fetch_daily(lat: float, lon: float, *, past_days: int = 7,
     params = {
         "latitude": lat,
         "longitude": lon,
-        "daily": "et0_fao_evapotranspiration,precipitation_sum",
+        "daily": "et0_fao_evapotranspiration,precipitation_sum,windspeed_10m_max",
         "past_days": past_days,
         "forecast_days": forecast_days,
         "timezone": "auto",
@@ -51,10 +51,11 @@ async def fetch_daily(lat: float, lon: float, *, past_days: int = 7,
     resp.raise_for_status()
     daily = resp.json()["daily"]
     return [
-        {"date": d, "et0": et0, "rain_mm": rain}
-        for d, et0, rain in zip(
+        {"date": d, "et0": et0, "rain_mm": rain, "wind_kmh": wind}
+        for d, et0, rain, wind in zip(
             daily["time"],
             daily["et0_fao_evapotranspiration"],
             daily["precipitation_sum"],
+            daily["windspeed_10m_max"],
         )
     ]

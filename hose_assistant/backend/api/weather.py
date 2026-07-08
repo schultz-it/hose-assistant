@@ -17,7 +17,8 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from .. import models
-from ..core import kc, sun, weather
+from ..core import engine as eng
+from ..core import sun, weather
 from ..db import get_db
 from .config import ensure_config
 
@@ -95,23 +96,7 @@ async def refresh_balance(db: Session = Depends(get_db)) -> dict:
     today = date.today().isoformat()
     actuals = [d for d in daily if d["date"] < today]
     zones = db.scalars(select(models.Zone).where(models.Zone.enabled)).all()
-
-    written = 0
-    for zone in zones:
-        for day in actuals:
-            month = int(day["date"][5:7])
-            row = db.scalar(
-                select(models.WaterBalance).where(
-                    models.WaterBalance.zone_id == zone.id,
-                    models.WaterBalance.date == day["date"],
-                )
-            )
-            if row is None:
-                row = models.WaterBalance(zone_id=zone.id, date=day["date"])
-                db.add(row)
-            row.et0 = day["et0"]
-            row.rain_mm = day["rain_mm"]
-            row.kc_eff = kc.kc_eff(zone, month)
-            written += 1
+    written = eng.fill_balance(db, actuals)
+    eng.update_deficits(db, cfg)
     db.commit()
     return {"zones": len(zones), "days": len(actuals), "rows_written": written}

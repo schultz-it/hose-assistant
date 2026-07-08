@@ -1,0 +1,108 @@
+"""APScheduler wiring (SPEC 2, 6): persisted jobs + the daily calc pipeline.
+
+Job store lives in ``/data/scheduler.db`` so watchdog turn-offs survive
+restarts (they fire on startup if their time passed while we were down).
+
+Jobs:
+  * ``daily_calc``  — cron at cfg.daily_calc_time: refresh weather, update
+    deficits, plan today, arm today's execution.
+  * ``execute_plan``— date job at the program window start.
+  * ``watchdog_*``  — per-valve forced turn-off (see executor).
+"""
+import logging
+from datetime import date, datetime
+
+from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from sqlalchemy import select
+
+from .. import models
+from ..db import DATA_DIR, SessionLocal
+from . import engine as eng
+from . import executor as ex
+from . import weather
+
+log = logging.getLogger(__name__)
+
+scheduler: AsyncIOScheduler | None = None
+
+
+def init() -> AsyncIOScheduler:
+    """Create + start the scheduler and arm the daily job. Idempotent."""
+    global scheduler
+    if scheduler is not None:
+        return scheduler
+    scheduler = AsyncIOScheduler(
+        jobstores={"default": SQLAlchemyJobStore(url=f"sqlite:///{DATA_DIR}/scheduler.db")}
+    )
+    ex.set_scheduler(scheduler)
+    scheduler.start()
+    reschedule_daily_calc()
+    return scheduler
+
+
+def shutdown() -> None:
+    global scheduler
+    if scheduler is not None:
+        scheduler.shutdown(wait=False)
+        scheduler = None
+        ex.set_scheduler(None)
+
+
+def reschedule_daily_calc() -> None:
+    """(Re)arm the daily calc cron from the configured time."""
+    if scheduler is None:
+        return
+    with SessionLocal() as db:
+        cfg = db.get(models.SystemConfig, 1)
+        calc_time = (cfg.daily_calc_time if cfg else None) or "03:00"
+    hour, minute = (int(x) for x in calc_time.split(":")[:2])
+    scheduler.add_job(
+        daily_calc, "cron", hour=hour, minute=minute,
+        id="daily_calc", replace_existing=True, misfire_grace_time=3600,
+    )
+    log.info("Daily calc scheduled at %s", calc_time)
+
+
+async def daily_calc() -> None:
+    """The engine tick: weather -> balance -> deficits -> plan -> arm run."""
+    with SessionLocal() as db:
+        cfg = db.get(models.SystemConfig, 1)
+        if cfg is None or cfg.latitude is None or cfg.longitude is None:
+            eng.log_event(db, "warning", "Daily calc skipped: location not set")
+            db.commit()
+            return
+        try:
+            daily = await weather.fetch_daily(cfg.latitude, cfg.longitude)
+        except Exception as exc:  # noqa: BLE001
+            eng.log_event(db, "error", f"Daily calc: weather fetch failed: {exc}")
+            db.commit()
+            return
+        today_iso = date.today().isoformat()
+        eng.fill_balance(db, [d for d in daily if d["date"] < today_iso])
+        eng.update_deficits(db, cfg)
+        # Drop stale planned rows for today, then re-plan.
+        for row in db.scalars(
+            select(models.Schedule).where(models.Schedule.status == "planned")
+        ).all():
+            db.delete(row)
+        created = eng.plan_today(db, cfg, daily)
+        db.commit()
+        if created and scheduler is not None:
+            first_start = min(r.start for r in created)
+            run_ids = [r.id for r in created]
+            scheduler.add_job(
+                execute_plan, "date",
+                run_date=max(first_start, datetime.now()),
+                args=[run_ids], id="execute_plan", replace_existing=True,
+                misfire_grace_time=3600,
+            )
+            log.info("Execution armed at %s for %d run(s)", first_start, len(created))
+
+
+async def execute_plan(run_ids: list[int]) -> None:
+    started = await ex.executor.run_schedule(run_ids)
+    if not started:
+        with SessionLocal() as db:
+            eng.log_event(db, "warning", "Planned run not started: executor busy")
+            db.commit()

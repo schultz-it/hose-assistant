@@ -11,7 +11,9 @@ from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 
 from . import models  # noqa: F401  (import registers the ORM models on Base)
-from .api import config, programs, weather, zones
+from .api import config, programs, runs, weather, zones
+from .core import scheduler as sched
+from .core.executor import executor
 from .db import Base, SessionLocal, engine
 
 SUPERVISOR = "http://supervisor/core/api"
@@ -20,13 +22,20 @@ TOKEN = os.environ.get("SUPERVISOR_TOKEN", "")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Create tables and ensure the singleton config exists on startup."""
+    """Startup: tables, singleton config, scheduler, close-all clean slate."""
     Base.metadata.create_all(bind=engine)
     with SessionLocal() as db:
         if db.get(models.SystemConfig, 1) is None:
             db.add(models.SystemConfig(id=1))
             db.commit()
+    sched.init()
+    # SPEC failsafe: on add-on start, close all known valves ("clean slate").
+    # Skipped outside HA (no SUPERVISOR_TOKEN) to keep local dev/tests quiet.
+    if os.environ.get("SUPERVISOR_TOKEN"):
+        await executor.close_everything("startup clean slate")
     yield
+    await executor.stop_all()
+    sched.shutdown()
 
 
 app = FastAPI(title="Hose Assistant", lifespan=lifespan)
@@ -35,6 +44,7 @@ app.include_router(config.router)
 app.include_router(zones.router)
 app.include_router(programs.router)
 app.include_router(weather.router)
+app.include_router(runs.router)
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -42,7 +52,7 @@ async def root() -> str:
     # Temporary dev page — replaced by the real SPA in Milestone 5.
     return """<html><body style="font-family:sans-serif;max-width:40rem;margin:2rem auto">
 <h1>🚿 Hose Assistant</h1>
-<p>Add-on running. Milestones 1–3 OK.</p>
+<p>Add-on running. Milestones 1–4 OK.</p>
 <h3>Location</h3>
 <p>lat <input id="lat" size="9"> long <input id="lon" size="9">
 <button onclick="saveLoc()">Save</button> <span id="locmsg"></span></p>
@@ -53,6 +63,32 @@ async def root() -> str:
 <a href="api/ha/entities">HA entities</a></p>
 <p><button onclick="refreshBal()">Refresh balance from Open-Meteo</button>
 <span id="balmsg"></span></p>
+<h3>Engine &amp; executor</h3>
+<p><a href="api/schedule">schedule</a> · <a href="api/log">event log</a></p>
+<p><button onclick="recalc()">Recalc plan now</button> <span id="recmsg"></span></p>
+<p>Run zone id <input id="rzid" size="3" value="1"> for
+<input id="rzmin" size="4" value="1"> min
+<button onclick="runZone()">Run</button>
+<button onclick="stopAll()" style="color:red">STOP ALL</button>
+<span id="runmsg"></span></p>
+<script>
+function recalc(){
+  recmsg.textContent='working…';
+  fetch('api/engine/recalc',{method:'POST'}).then(r=>r.json())
+  .then(j=>{recmsg.textContent=JSON.stringify(j);})
+  .catch(e=>{recmsg.textContent='error: '+e;});
+}
+function runZone(){
+  runmsg.textContent='starting…';
+  fetch('api/run/zone/'+rzid.value+'?minutes='+rzmin.value,{method:'POST'})
+  .then(r=>r.json()).then(j=>{runmsg.textContent=JSON.stringify(j);})
+  .catch(e=>{runmsg.textContent='error: '+e;});
+}
+function stopAll(){
+  fetch('api/stop_all',{method:'POST'}).then(r=>r.json())
+  .then(j=>{runmsg.textContent=JSON.stringify(j);});
+}
+</script>
 <script>
 fetch('api/config').then(r=>r.json()).then(c=>{
   if(c.latitude!=null) document.getElementById('lat').value=c.latitude;
