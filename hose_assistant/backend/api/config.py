@@ -31,8 +31,23 @@ def get_config(db: Session = Depends(get_db)):
 @router.put("", response_model=schemas.ConfigRead)
 def update_config(payload: schemas.ConfigUpdate, db: Session = Depends(get_db)):
     cfg = ensure_config(db)
-    for field, value in payload.model_dump(exclude_unset=True).items():
+    data = payload.model_dump(exclude_unset=True)
+    for field, value in data.items():
         setattr(cfg, field, value)
+
+    # SPEC 5.1: elevation auto-fetched from Open-Meteo when location is set
+    # and the user did not provide it explicitly. Best-effort: never fail the
+    # config save because the elevation service is unreachable.
+    location_changed = "latitude" in data or "longitude" in data
+    if (location_changed and "elevation_m" not in data
+            and cfg.latitude is not None and cfg.longitude is not None):
+        try:
+            from ..core.weather import fetch_elevation_sync
+
+            cfg.elevation_m = fetch_elevation_sync(cfg.latitude, cfg.longitude)
+        except Exception:
+            pass
+
     db.commit()
     db.refresh(cfg)
     return cfg

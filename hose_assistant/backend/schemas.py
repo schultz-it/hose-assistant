@@ -79,7 +79,7 @@ class ZoneCreate(BaseModel):
     area_m2: Optional[float] = Field(default=None, gt=0)
     slope: Slope = "flat"
     shade_preset: ShadePreset = "full_sun"
-    shade_fine: int = Field(50, ge=0, le=100)
+    shade_fine: int = Field(0, ge=0, le=100)
     shade_monthly: Optional[list[float]] = None
     moisture_entity: Optional[str] = None
     moisture_skip_pct: Optional[float] = Field(default=None, ge=0, le=100)

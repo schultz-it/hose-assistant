@@ -11,7 +11,7 @@ from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 
 from . import models  # noqa: F401  (import registers the ORM models on Base)
-from .api import config, programs, zones
+from .api import config, programs, weather, zones
 from .db import Base, SessionLocal, engine
 
 SUPERVISOR = "http://supervisor/core/api"
@@ -34,21 +34,44 @@ app = FastAPI(title="Hose Assistant", lifespan=lifespan)
 app.include_router(config.router)
 app.include_router(zones.router)
 app.include_router(programs.router)
+app.include_router(weather.router)
 
 
 @app.get("/", response_class=HTMLResponse)
 async def root() -> str:
-    return (
-        "<html><body style='font-family:sans-serif;text-align:center;"
-        "padding-top:4rem'><h1>🚿 Hose Assistant</h1>"
-        "<p>Add-on running. Milestones 1–2 OK.</p>"
-        "<p>Data layer:"
-        " <a href='api/config'>config</a> ·"
-        " <a href='api/zones'>zones</a> ·"
-        " <a href='api/programs'>programs</a></p>"
-        "<p><a href='api/ha/entities'>Test Supervisor API →</a></p>"
-        "</body></html>"
-    )
+    # Temporary dev page — replaced by the real SPA in Milestone 5.
+    return """<html><body style="font-family:sans-serif;max-width:40rem;margin:2rem auto">
+<h1>🚿 Hose Assistant</h1>
+<p>Add-on running. Milestones 1–3 OK.</p>
+<h3>Location</h3>
+<p>lat <input id="lat" size="9"> long <input id="lon" size="9">
+<button onclick="saveLoc()">Save</button> <span id="locmsg"></span></p>
+<h3>Data</h3>
+<p><a href="api/config">config</a> · <a href="api/zones">zones</a> ·
+<a href="api/programs">programs</a> · <a href="api/balance">balance</a> ·
+<a href="api/weather/summary">weather summary</a> ·
+<a href="api/ha/entities">HA entities</a></p>
+<p><button onclick="refreshBal()">Refresh balance from Open-Meteo</button>
+<span id="balmsg"></span></p>
+<script>
+fetch('api/config').then(r=>r.json()).then(c=>{
+  if(c.latitude!=null) document.getElementById('lat').value=c.latitude;
+  if(c.longitude!=null) document.getElementById('lon').value=c.longitude;
+});
+function saveLoc(){
+  fetch('api/config',{method:'PUT',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({latitude:parseFloat(lat.value),longitude:parseFloat(lon.value)})})
+  .then(r=>r.json()).then(c=>{
+    locmsg.textContent='saved — elevation '+(c.elevation_m??'n/a')+' m';
+  }).catch(e=>{locmsg.textContent='error: '+e;});
+}
+function refreshBal(){
+  balmsg.textContent='fetching…';
+  fetch('api/balance/refresh',{method:'POST'}).then(r=>r.json())
+  .then(j=>{balmsg.textContent=JSON.stringify(j);})
+  .catch(e=>{balmsg.textContent='error: '+e;});
+}
+</script></body></html>"""
 
 
 @app.get("/api/health")

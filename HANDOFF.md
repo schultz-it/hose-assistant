@@ -46,8 +46,9 @@ hose-assistant/                    ← repo root, ready to publish on GitHub
 
 **Milestone status:**
 - ✅ **Milestone 1** (skeleton) — tested OK on Andrea's HA (Ingress hello page + Supervisor API entity listing both work; relative-URL routing under Ingress confirmed).
-- ✅ **Milestone 2** (data layer) — SQLite in `/data` + SQLAlchemy models + CRUD API for config/zones/programs. Verified locally end-to-end (34/34 checks: CRUD, validation 422, 404, JSON fields, persistence across restarts). Version bumped to 0.2.0. **Not yet re-tested on HA** — Andrea should reinstall/update the add-on and confirm the new `/api/config`, `/api/zones`, `/api/programs` links respond.
-- Milestones 3–10 not started (see SPEC §12).
+- ✅ **Milestone 2** (data layer) — SQLite in `/data` + SQLAlchemy models + CRUD API for config/zones/programs. Verified locally (34/34 checks) AND confirmed on Andrea's HA (0.2.1 installed, JSON endpoints respond). Note: 0.2.1 also dropped armv7 (32-bit removed by HA/builder in 2026) and fixed CI (builder needs explicit `--image`); GitHub Actions builds are green for aarch64+amd64.
+- ✅ **Milestone 3** (weather + sun) — Open-Meteo client (`core/weather.py`: daily ET₀ + rain, past+forecast; elevation API), `core/sun.py` (astral), `core/kc.py` (monthly Kc tables × shade factor; `shade_fine` 0–100 → factor 1.0→0.5, preset sets slider default, so Zone default `shade_fine` is now 0). Endpoints: `GET /api/weather/summary`, `GET /api/balance`, `POST /api/balance/refresh` (upserts et0/rain/kc_eff per enabled zone per past day; deficit left to M4). Elevation auto-fetched on config PUT when lat/long set. Temp dev page has a location form + refresh button. Verified locally with real Open-Meteo (29/29 checks; Correzzana 257 m, July ET₀ ~4–6 mm). Version 0.3.0. **Pending test on Andrea's HA.**
+- Milestones 4–10 not started (see SPEC §12).
 
 **Repo published (2026-07-08):** public at **https://github.com/schultz-it/hose-assistant**, default branch `main`. Git identity: Andrea Brunelli <andrea@imballaggibrunelli.it>. `gh` CLI authenticated as `schultz-it` (scopes incl. `repo`, `workflow`) with git credential helper configured.
 
