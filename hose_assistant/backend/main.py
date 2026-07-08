@@ -1,18 +1,39 @@
-"""Hose Assistant — Milestone 1 skeleton.
+"""Hose Assistant — FastAPI application.
 
-Serves a hello page through HA Ingress and proves Supervisor API access
-by listing switch/valve entities at /api/ha/entities.
+Milestone 1: Ingress hello page + Supervisor API entity listing.
+Milestone 2: SQLite data layer + CRUD API for config, zones and programs.
 """
 import os
+from contextlib import asynccontextmanager
 
 import httpx
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 
+from . import models  # noqa: F401  (import registers the ORM models on Base)
+from .api import config, programs, zones
+from .db import Base, SessionLocal, engine
+
 SUPERVISOR = "http://supervisor/core/api"
 TOKEN = os.environ.get("SUPERVISOR_TOKEN", "")
 
-app = FastAPI(title="Hose Assistant")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Create tables and ensure the singleton config exists on startup."""
+    Base.metadata.create_all(bind=engine)
+    with SessionLocal() as db:
+        if db.get(models.SystemConfig, 1) is None:
+            db.add(models.SystemConfig(id=1))
+            db.commit()
+    yield
+
+
+app = FastAPI(title="Hose Assistant", lifespan=lifespan)
+
+app.include_router(config.router)
+app.include_router(zones.router)
+app.include_router(programs.router)
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -20,7 +41,11 @@ async def root() -> str:
     return (
         "<html><body style='font-family:sans-serif;text-align:center;"
         "padding-top:4rem'><h1>🚿 Hose Assistant</h1>"
-        "<p>Add-on skeleton is running. Milestone 1 OK.</p>"
+        "<p>Add-on running. Milestones 1–2 OK.</p>"
+        "<p>Data layer:"
+        " <a href='api/config'>config</a> ·"
+        " <a href='api/zones'>zones</a> ·"
+        " <a href='api/programs'>programs</a></p>"
         "<p><a href='api/ha/entities'>Test Supervisor API →</a></p>"
         "</body></html>"
     )

@@ -44,19 +44,21 @@ hose-assistant/                    ← repo root, ready to publish on GitHub
     └── frontend/dist/.gitkeep     ← placeholder; frontend not started
 ```
 
-**Milestone status: Milestone 1 is scaffolded but NOT yet tested on a real HA instance.** Everything else (Milestones 2–10, see SPEC §12) is not started.
+**Milestone status:**
+- ✅ **Milestone 1** (skeleton) — tested OK on Andrea's HA (Ingress hello page + Supervisor API entity listing both work; relative-URL routing under Ingress confirmed).
+- ✅ **Milestone 2** (data layer) — SQLite in `/data` + SQLAlchemy models + CRUD API for config/zones/programs. Verified locally end-to-end (34/34 checks: CRUD, validation 422, 404, JSON fields, persistence across restarts). Version bumped to 0.2.0. **Not yet re-tested on HA** — Andrea should reinstall/update the add-on and confirm the new `/api/config`, `/api/zones`, `/api/programs` links respond.
+- Milestones 3–10 not started (see SPEC §12).
 
-**Repo published (2026-07-08):** public at **https://github.com/schultz-it/hose-assistant**, default branch `main`, initial commit `Initial scaffold: Milestone 1 skeleton`. Git identity: Andrea Brunelli <andrea@imballaggibrunelli.it>. `gh` CLI authenticated as `schultz-it` (scopes incl. `repo`, `workflow`) with git credential helper configured.
+**Repo published (2026-07-08):** public at **https://github.com/schultz-it/hose-assistant**, default branch `main`. Git identity: Andrea Brunelli <andrea@imballaggibrunelli.it>. `gh` CLI authenticated as `schultz-it` (scopes incl. `repo`, `workflow`) with git credential helper configured.
+
+**Local dev/test setup:** system `python3` is 3.9 (too old for `X | None` runtime annotations); use `/opt/homebrew/bin/python3.11` for a venv. Set `DATA_DIR` env var to point the SQLite DB at a writable folder outside `/data` when testing off-HA. A verification script lives in the session scratchpad (`verify_m2.py`).
 
 ## Immediate next steps (in order)
 
-1. ~~**Publish the repo**~~ — ✅ done. Repo live at https://github.com/schultz-it/hose-assistant.
-2. **Test Milestone 1 on HA**: add the GitHub repo URL in HA (Settings → Add-ons → Repositories), install Hose Assistant, start it, open the sidebar panel → expect the hello page; click "Test Supervisor API" → expect a JSON list of `switch.*` entities.
-   - Faster dev loop alternative: copy the `hose_assistant/` add-on folder into HA's `/addons` local directory via Samba and use "Local add-ons".
-3. **Known Milestone 1 gaps to close before calling it done**:
-   - Ingress path handling: the SPA/API must work under the HA-proxied path (honor `X-Ingress-Path`, use relative URLs). The current hello page uses a relative link — verify it works via Ingress.
-   - `uvicorn` root behavior behind Ingress may need `--root-path` handling.
-4. **Then proceed milestone by milestone** (SPEC §12): 2 data layer → 3 weather+sun → 4 engine+executor (test with `input_boolean` mock valves, keep them for days before touching real valves) → 5 UI tabs 1/2/4 → 6 rule-based generator + wizard → 7 intensity/overrides/rain delay/off → 8 HA entity exposure → 9 AI generator → 10 i18n/docs/release.
+1. ~~Publish the repo~~ — ✅ done.
+2. ~~Test Milestone 1 on HA~~ — ✅ done.
+3. **Re-test Milestone 2 on HA**: in HA, update/reinstall the add-on (Settings → Add-ons → Hose Assistant → rebuild/update), start it, open the panel → the hello page now shows **config · zones · programs** links; clicking each should return JSON (`config` = the singleton, `zones`/`programs` = `[]` until created). Remaining M1 ingress note still open but low-risk: `uvicorn --root-path` handling may be needed once the real SPA generates absolute URLs (revisit in Milestone 5).
+4. **Then proceed milestone by milestone** (SPEC §12): 3 weather+sun → 4 engine+executor (test with `input_boolean` mock valves, keep them for days before touching real valves) → 5 UI tabs 1/2/4 → 6 rule-based generator + wizard → 7 intensity/overrides/rain delay/off → 8 HA entity exposure → 9 AI generator → 10 i18n/docs/release.
 
 ## Working conventions
 
