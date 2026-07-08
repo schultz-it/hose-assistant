@@ -2,13 +2,18 @@
 
 Milestone 1: Ingress hello page + Supervisor API entity listing.
 Milestone 2: SQLite data layer + CRUD API for config, zones and programs.
+Milestone 3: Open-Meteo weather + sun + balance filling.
+Milestone 4: calculation engine + valve executor with failsafes.
+Milestone 5: Preact SPA (served from frontend/dist; dev page moved to /dev).
 """
 import os
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 import httpx
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
 
 from . import models  # noqa: F401  (import registers the ORM models on Base)
 from .api import config, programs, runs, weather, zones
@@ -47,9 +52,9 @@ app.include_router(weather.router)
 app.include_router(runs.router)
 
 
-@app.get("/", response_class=HTMLResponse)
-async def root() -> str:
-    # Temporary dev page — replaced by the real SPA in Milestone 5.
+@app.get("/dev", response_class=HTMLResponse)
+async def dev_page() -> str:
+    # Developer/debug page (the user-facing SPA is served at /).
     return """<html><body style="font-family:sans-serif;max-width:40rem;margin:2rem auto">
 <h1>🚿 Hose Assistant</h1>
 <p>Add-on running. Milestones 1–4 OK.</p>
@@ -170,3 +175,10 @@ async def ha_entities(domain: str = "switch") -> dict:
         if s["entity_id"].startswith(f"{domain}.")
     ]
     return {"domain": domain, "count": len(entities), "entities": entities}
+
+
+# Serve the built SPA (Milestone 5). Mounted last so /api/* and /dev win.
+# html=True serves index.html at "/" and for unknown paths (SPA routing).
+FRONTEND_DIST = Path(__file__).resolve().parent.parent / "frontend" / "dist"
+if (FRONTEND_DIST / "index.html").exists():
+    app.mount("/", StaticFiles(directory=FRONTEND_DIST, html=True), name="spa")

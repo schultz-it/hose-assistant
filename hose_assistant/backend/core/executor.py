@@ -178,7 +178,7 @@ class Executor:
             except asyncio.CancelledError:
                 raise  # stop_all() takes over the cleanup
             except Exception as exc:  # noqa: BLE001 — HA unreachable etc.
-                eng.log_event(db, "error", f"Session aborted: {exc}")
+                eng.log_event(db, "error", f"Session aborted: {exc!r}")
                 db.commit()
                 await self.close_everything("session aborted on error")
 

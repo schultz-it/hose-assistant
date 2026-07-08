@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.5.0
+- Web UI (Milestone 5): mobile-first Preact + Tailwind SPA with bottom tab bar,
+  dark/light theme, served at the panel root (dev page moved to /dev).
+  - **Dashboard**: now/idle status, watering-intensity slider (applies live),
+    per-zone soil-reservoir bars with dry threshold, upcoming runs with skip,
+    run-zone / recalculate / STOP ALL controls, event log. Auto-refreshes.
+  - **Zones**: card list + full editor (type/soil/vegetation presets that
+    prefill rates, shade preset + fine slider, slope, max runtime).
+  - **Setup**: location with auto elevation, master valve, thresholds; shown
+    first on a fresh install.
+  - **Programs**: read-only list (editor arrives with the generator).
+- New endpoint: GET /api/status (dashboard payload).
+- i18n scaffolding: English catalog; translations arrive in a later milestone.
+
 ## 0.4.1
 - Dev page: zone management (list/add/delete) with valve-entity autocomplete
   from HA (input_boolean mocks first, then switches).

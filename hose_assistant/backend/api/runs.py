@@ -9,12 +9,51 @@ from sqlalchemy.orm import Session
 from .. import models
 from ..core import engine as eng
 from ..core import scheduler as sched
-from ..core import weather
+from ..core import soil, weather
 from ..core.executor import executor
 from ..db import get_db
 from .config import ensure_config
 
 router = APIRouter(prefix="/api", tags=["runs"])
+
+
+@router.get("/status")
+def get_status(db: Session = Depends(get_db)) -> dict:
+    """One-call dashboard payload: system, executor, per-zone reservoir."""
+    cfg = ensure_config(db)
+    program = eng.active_program(db, date.today())
+    mad_pct = program.mad_pct if program else 50.0
+    zones = db.scalars(
+        select(models.Zone).order_by(models.Zone.order, models.Zone.id)
+    ).all()
+    zone_status = []
+    for z in zones:
+        taw = soil.taw_mm(z)
+        deficit = eng.current_deficit(db, z.id)
+        zone_status.append({
+            "id": z.id, "name": z.name, "icon": z.icon, "enabled": z.enabled,
+            "deficit_mm": round(deficit, 1), "taw_mm": round(taw, 1),
+            "trigger_mm": round(mad_pct / 100.0 * taw, 1),
+        })
+    upcoming = db.scalars(
+        select(models.Schedule)
+        .where(models.Schedule.status.in_(["planned", "running"]))
+        .order_by(models.Schedule.start)
+        .limit(20)
+    ).all()
+    return {
+        "busy": executor.busy,
+        "system_enabled": cfg.system_enabled,
+        "watering_intensity": cfg.watering_intensity,
+        "rain_delay_until": cfg.rain_delay_until.isoformat() if cfg.rain_delay_until else None,
+        "active_program": {"id": program.id, "name": program.name} if program else None,
+        "zones": zone_status,
+        "upcoming": [
+            {"id": r.id, "zone_id": r.zone_id, "start": r.start.isoformat() if r.start else None,
+             "duration_min": r.duration_min, "status": r.status}
+            for r in upcoming
+        ],
+    }
 
 
 @router.get("/schedule")

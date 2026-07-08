@@ -5,10 +5,11 @@ __pycache__/
 venv/
 *.egg-info/
 
-# Node / frontend build
+# Node (frontend/dist IS committed: the add-on image copies it at build time)
 node_modules/
-hose_assistant/frontend/dist/*
-!hose_assistant/frontend/dist/.gitkeep
+
+# Local tooling
+.claude/
 
 # Local data / DB
 *.db

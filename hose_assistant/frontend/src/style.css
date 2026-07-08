@@ -1,0 +1,4 @@
+@import "tailwindcss";
+
+/* Follow the OS / HA theme */
+:root { color-scheme: light dark; }
