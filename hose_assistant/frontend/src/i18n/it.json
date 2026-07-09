@@ -31,6 +31,11 @@
   "setup.expose": "Esponi entità a Home Assistant",
   "setup.expose_hint": "Sensori deficit e prossima irrigazione per zona, zona/programma attivi, più interruttore di sistema e intensità — via MQTT discovery se c'è un broker (altrimenti sensori REST in sola lettura). Attivo entro un minuto.",
   "setup.language": "Lingua",
+  "setup.backup": "Backup e ripristino",
+  "setup.backup_hint": "Esporta tutte le impostazioni e lo storico (zone, programmi, bilancio idrico, registro eventi) in un file JSON, o ripristina da uno. La cartella /data è comunque inclusa negli snapshot di Home Assistant.",
+  "setup.backup_download": "Scarica backup",
+  "setup.backup_restore": "Ripristina da file",
+  "setup.restore_confirm": "Il ripristino SOSTITUISCE tutte le impostazioni e lo storico attuali con il backup. Continuare?",
 
   "zones.title": "Zone",
   "zones.empty": "Nessuna zona. Aggiungi la prima qui sotto.",

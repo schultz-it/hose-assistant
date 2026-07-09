@@ -28,6 +28,12 @@
   "setup.wind_skip": "Skip spray zones if wind ≥ (km/h, empty = off)",
   "setup.weather_entity": "HA weather entity (optional — overrides forecast rain)",
   "setup.weather_test": "Test",
+  "setup.language": "Language",
+  "setup.backup": "Backup & restore",
+  "setup.backup_hint": "Export all settings and history (zones, programs, water-balance, event log) to a JSON file, or restore from one. Your /data is also included in Home Assistant snapshots.",
+  "setup.backup_download": "Download backup",
+  "setup.backup_restore": "Restore from file",
+  "setup.restore_confirm": "Restore will REPLACE all current settings and history with the backup. Continue?",
   "setup.expose": "Expose entities to Home Assistant",
   "setup.expose_hint": "Per-zone deficit & next-run sensors, active zone/program, plus a system switch and intensity number — via MQTT discovery if a broker is available (REST read-only sensors otherwise). Takes effect within a minute.",
 

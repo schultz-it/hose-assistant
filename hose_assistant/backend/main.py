@@ -16,7 +16,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 
 from . import models  # noqa: F401  (import registers the ORM models on Base)
-from .api import config, programs, runs, weather, zones
+from .api import backup, config, programs, runs, weather, zones
 from .core import scheduler as sched
 from .core.executor import executor
 from .db import Base, SessionLocal, apply_migrations, engine
@@ -51,6 +51,7 @@ app.include_router(zones.router)
 app.include_router(programs.router)
 app.include_router(weather.router)
 app.include_router(runs.router)
+app.include_router(backup.router)
 
 
 @app.get("/dev", response_class=HTMLResponse)

@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.3
+- Backup & restore from the Setup tab: export all settings and history
+  (config, zones, programs, water-balance, schedule, event log) to a JSON
+  file, or restore from one (replaces current data; stops any running
+  session first). New GET /api/backup, POST /api/restore.
+
 ## 1.0.2
 - Reset soil reservoir per zone (↺ next to each reservoir bar): marks the
   zone as fully watered — useful after hand-watering or an unrecorded storm.

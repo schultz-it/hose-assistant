@@ -1,12 +1,46 @@
-import { useEffect, useState } from "preact/hooks";
-import { get, put } from "../api.js";
+import { useEffect, useRef, useState } from "preact/hooks";
+import { get, post, put } from "../api.js";
 import { LANGUAGES, t } from "../i18n.js";
-import { Card, Field, inputCls, btnCls } from "../app.jsx";
+import { Card, Field, inputCls, btnCls, btnGray } from "../app.jsx";
 
 export function Setup() {
   const [cfg, setCfg] = useState(null);
   const [entities, setEntities] = useState([]);
   const [msg, setMsg] = useState("");
+  const [bkMsg, setBkMsg] = useState("");
+  const fileRef = useRef(null);
+
+  async function downloadBackup() {
+    setBkMsg("…");
+    try {
+      const resp = await fetch("api/backup");
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      const blob = await resp.blob();
+      const name = (resp.headers.get("Content-Disposition") || "")
+        .match(/filename="(.+?)"/)?.[1] || "hose_assistant_backup.json";
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url; a.download = name; a.click();
+      URL.revokeObjectURL(url);
+      setBkMsg("✓");
+    } catch (e) {
+      setBkMsg(`✗ ${e.message}`);
+    }
+  }
+
+  async function restoreBackup(file) {
+    if (!file) return;
+    if (!confirm(t("setup.restore_confirm"))) return;
+    setBkMsg("…");
+    try {
+      const data = JSON.parse(await file.text());
+      const res = await post("api/restore", data);
+      setBkMsg(`✓ ${JSON.stringify(res.restored)}`);
+      setTimeout(() => window.location.reload(), 800);
+    } catch (e) {
+      setBkMsg(`✗ ${e.message}`);
+    }
+  }
 
   useEffect(() => {
     get("api/config").then(setCfg);
@@ -137,6 +171,22 @@ export function Setup() {
         <div class="flex items-center gap-3">
           <button class={btnCls} onClick={save}>{t("common.save")}</button>
           <span class="text-sm">{msg}</span>
+        </div>
+      </Card>
+
+      <Card title={t("setup.backup")}>
+        <p class="text-xs text-gray-500 mb-3">{t("setup.backup_hint")}</p>
+        <div class="flex items-center gap-2 flex-wrap">
+          <button class={btnGray} onClick={downloadBackup}>
+            ⬇ {t("setup.backup_download")}
+          </button>
+          <button class={btnGray} onClick={() => fileRef.current?.click()}>
+            ⬆ {t("setup.backup_restore")}
+          </button>
+          <input ref={fileRef} type="file" accept="application/json,.json"
+            class="hidden"
+            onChange={(e) => restoreBackup(e.target.files?.[0])} />
+          <span class="text-sm">{bkMsg}</span>
         </div>
       </Card>
     </div>
