@@ -1,0 +1,33 @@
+version: 2
+updates:
+  # Backend Python dependencies (FastAPI, uvicorn, SQLAlchemy, httpx, ...)
+  - package-ecosystem: pip
+    directory: /hose_assistant/backend
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+    commit-message:
+      prefix: deps
+
+  # Frontend build dependencies (Vite, Preact, Tailwind — build-time only)
+  - package-ecosystem: npm
+    directory: /hose_assistant/frontend
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+    commit-message:
+      prefix: deps(frontend)
+
+  # The build workflow's GitHub Actions (home-assistant/builder, checkout, ...)
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    labels:
+      - dependencies
+    commit-message:
+      prefix: ci
