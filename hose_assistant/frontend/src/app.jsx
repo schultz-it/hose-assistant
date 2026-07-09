@@ -1,5 +1,5 @@
 import { useEffect, useState } from "preact/hooks";
-import { t } from "./i18n.js";
+import { setLang, t } from "./i18n.js";
 import { get } from "./api.js";
 import { Setup } from "./tabs/Setup.jsx";
 import { Zones } from "./tabs/Zones.jsx";
@@ -19,7 +19,10 @@ export function App() {
 
   useEffect(() => {
     get("api/config")
-      .then((c) => setTab(c.latitude == null ? "setup" : "dashboard"))
+      .then((c) => {
+        setLang(c.language || "en");
+        setTab(c.latitude == null ? "setup" : "dashboard");
+      })
       .catch(() => setTab("setup"));
   }, []);
 

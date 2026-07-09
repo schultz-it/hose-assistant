@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.0.0 🎉
+- First stable release.
+- Italian translation (`it.json`) + language picker in Setup (English stays
+  the source language; adding a language = one JSON file + PR).
+- Complete in-HA documentation (DOCS.md): full field reference with practical
+  examples — sprinkler precipitation-rate from catalog / catch-cup test,
+  dripline calculator walkthrough, AI provider setup (OpenAI/Anthropic/HA
+  conversation agent) step by step, MQTT exposure, FAQ, troubleshooting,
+  privacy note.
+
 ## 0.9.0
 - AI program generator (Milestone 9, optional): providers ha_conversation
   (your HA conversation agent, zero extra keys), anthropic or openai (API key

@@ -4,7 +4,7 @@
 
 Hose Assistant is a Home Assistant **add-on** that calculates, schedules and executes lawn/garden irrigation based on real evapotranspiration (FAO-56 ET₀ via Open-Meteo, no API key needed), weather forecasts, soil/grass/shade characteristics and seasonal programs — with a polished, mobile-first UI and optional AI-assisted program generation.
 
-**Status: 🚧 under active development.** See [SPEC.md](SPEC.md) for the full specification and milestone plan.
+**Status: ✅ 1.0 released.** Full documentation ships inside the add-on (Documentation tab); the project specification lives in [SPEC.md](SPEC.md).
 
 ## Installation
 
@@ -16,7 +16,7 @@ Click the badge above, or manually:
 2. Add: `https://github.com/schultz-it/hose-assistant`
 3. Install **Hose Assistant** and start it. Open the UI from the sidebar.
 
-## Features (planned)
+## Features
 
 - Water-balance engine: ET₀ × crop coefficient × shade − rain, per zone
 - Unlimited zones: spray/rotor/MP/drip, soil & grass types, slope with cycle & soak, monthly shade profiles
@@ -24,7 +24,7 @@ Click the badge above, or manually:
 - Forecast rain skip, soil-moisture & rain-sensor skip, wind skip, rain delay, global intensity slider
 - Hard hardware failsafes on every valve actuation
 - Optional native HA entities via MQTT discovery
-- English UI & docs, fully translatable (i18n)
+- English UI & docs, Italian translation included, fully translatable (i18n)
 
 ## License
 

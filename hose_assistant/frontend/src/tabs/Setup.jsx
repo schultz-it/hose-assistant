@@ -1,6 +1,6 @@
 import { useEffect, useState } from "preact/hooks";
 import { get, put } from "../api.js";
-import { t } from "../i18n.js";
+import { LANGUAGES, t } from "../i18n.js";
 import { Card, Field, inputCls, btnCls } from "../app.jsx";
 
 export function Setup() {
@@ -24,8 +24,10 @@ export function Setup() {
 
   async function save() {
     setMsg("…");
+    const prevLang = (await get("api/config")).language || "en";
     try {
       const updated = await put("api/config", {
+        language: cfg.language || "en",
         latitude: cfg.latitude != null ? parseFloat(cfg.latitude) : null,
         longitude: cfg.longitude != null ? parseFloat(cfg.longitude) : null,
         units: cfg.units,
@@ -39,6 +41,7 @@ export function Setup() {
       });
       setCfg(updated);
       setMsg(`${t("common.saved")} ✓`);
+      if ((updated.language || "en") !== prevLang) window.location.reload();
     } catch (e) {
       setMsg(`✗ ${e.message}`);
     }
@@ -64,6 +67,13 @@ export function Setup() {
       </Card>
 
       <Card title={t("setup.title")}>
+        <Field label={t("setup.language")}>
+          <select class={inputCls} value={cfg.language || "en"} onInput={set("language")}>
+            {Object.entries(LANGUAGES).map(([code, name]) => (
+              <option key={code} value={code}>{name}</option>
+            ))}
+          </select>
+        </Field>
         <Field label={t("setup.units")}>
           <select class={inputCls} value={cfg.units} onInput={set("units")}>
             <option value="metric">metric</option>
