@@ -128,5 +128,7 @@
   "dash.turn_on": "Accendi sistema",
   "dash.rain_delay_btn": "Pausa pioggia",
   "dash.rain_delay_cancel": "annulla pausa",
-  "dash.override_prompt": "Nuova durata (minuti):"
+  "dash.override_prompt": "Nuova durata (minuti):",
+  "dash.reset_reservoir": "Segna riserva piena (es. dopo irrigazione a mano)",
+  "dash.reset_confirm": "Segnare la riserva del suolo come piena"
 }

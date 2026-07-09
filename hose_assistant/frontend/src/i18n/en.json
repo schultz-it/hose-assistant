@@ -127,5 +127,7 @@
   "dash.turn_on": "System ON",
   "dash.rain_delay_btn": "Rain delay",
   "dash.rain_delay_cancel": "cancel delay",
-  "dash.override_prompt": "New duration (minutes):"
+  "dash.override_prompt": "New duration (minutes):",
+  "dash.reset_reservoir": "Mark reservoir as full (e.g. after hand-watering)",
+  "dash.reset_confirm": "Mark the soil reservoir as full"
 }

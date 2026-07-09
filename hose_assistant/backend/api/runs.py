@@ -141,6 +141,29 @@ async def run_program(program_id: int, db: Session = Depends(get_db)) -> dict:
     return {"program_id": program_id, "runs": len(rows), "status": "started"}
 
 
+@router.post("/zones/{zone_id}/reset_reservoir")
+def reset_reservoir(zone_id: int, db: Session = Depends(get_db)) -> dict:
+    """Mark a zone's soil reservoir as FULL (deficit -> 0).
+
+    Recorded as manual irrigation equal to the current deficit, so the
+    balance chain stays consistent across recomputes (a raw zero would be
+    overwritten by the next daily calculation).
+    """
+    zone = db.get(models.Zone, zone_id)
+    if zone is None:
+        raise HTTPException(status_code=404, detail="Zone not found")
+    cfg = ensure_config(db)
+    deficit = eng.current_deficit(db, zone_id)
+    if deficit > 0:
+        eng.record_irrigation(db, zone_id, deficit)
+        eng.update_deficits(db, cfg)
+    eng.log_event(db, "info",
+                  f"Reservoir reset for '{zone.name}' "
+                  f"({deficit:.1f} mm recorded as manual irrigation)")
+    db.commit()
+    return {"zone_id": zone_id, "deficit_mm": eng.current_deficit(db, zone_id)}
+
+
 @router.post("/stop_all")
 async def stop_all(db: Session = Depends(get_db)) -> dict:
     await executor.stop_all()

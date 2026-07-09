@@ -89,10 +89,18 @@ export function Dashboard() {
           const dry = z.deficit_mm >= z.trigger_mm;
           return (
             <div key={z.id} class="mb-2">
-              <div class="flex justify-between text-sm">
+              <div class="flex justify-between text-sm items-center">
                 <span>{z.name}</span>
-                <span class={dry ? "text-amber-500" : "text-gray-500"}>
+                <span class={`flex items-center gap-2 ${dry ? "text-amber-500" : "text-gray-500"}`}>
                   💧 {left.toFixed(1)}/{z.taw_mm} mm{dry ? ` · ${t("dash.dry")}` : ""}
+                  <button class="text-xs text-gray-400 hover:text-sky-500"
+                    title={t("dash.reset_reservoir")}
+                    onClick={() => {
+                      if (confirm(`${t("dash.reset_confirm")} — ${z.name}?`))
+                        act(() => post(`api/zones/${z.id}/reset_reservoir`));
+                    }}>
+                    ↺
+                  </button>
                 </span>
               </div>
               <div class="h-2 rounded bg-gray-200 dark:bg-gray-800 overflow-hidden">

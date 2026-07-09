@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.2
+- Reset soil reservoir per zone (↺ next to each reservoir bar): marks the
+  zone as fully watered — useful after hand-watering or an unrecorded storm.
+  Recorded as manual irrigation equal to the current deficit so the balance
+  stays consistent across recomputes. New POST
+  /api/zones/{id}/reset_reservoir.
+
 ## 1.0.1
 - Brand identity: new icon and logo (white droplet with a negative-space
   house — Home Assistant living inside the water).
