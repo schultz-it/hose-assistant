@@ -103,15 +103,36 @@ export function Programs() {
   const [editing, setEditing] = useState(null);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState("");
+  const [ai, setAi] = useState({ available: false });
+  const [notes, setNotes] = useState("");
+  const [reviewText, setReviewText] = useState("");
 
   const load = () => get("api/programs").then(setPrograms);
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+    get("api/programs/ai_info").then(setAi).catch(() => {});
+  }, []);
 
-  async function generate() {
+  async function generate(engine) {
     setBusy(true);
-    setMsg(t("programs.generating"));
+    setMsg(engine === "ai" ? t("programs.generating_ai") : t("programs.generating"));
     try {
-      setProposal(await post("api/programs/generate", { engine: "rules" }));
+      const out = await post("api/programs/generate", { engine, notes: notes || null });
+      setProposal(out);
+      setMsg(out.engine_used === "rules_fallback" ? `⚠ ${t("programs.ai_fallback")}` : "");
+    } catch (e) {
+      setMsg(`✗ ${e.message}`);
+    }
+    setBusy(false);
+  }
+
+  async function askReview() {
+    setBusy(true);
+    setMsg(t("programs.reviewing"));
+    setReviewText("");
+    try {
+      const out = await post("api/programs/review", { notes: notes || null });
+      setReviewText(out.review);
       setMsg("");
     } catch (e) {
       setMsg(`✗ ${e.message}`);
@@ -167,10 +188,33 @@ export function Programs() {
               </>
             } />
           ))}
-          <div class="flex gap-2 items-center">
-            <button class={btnCls} disabled={busy} onClick={generate}>
+          {ai.available && (
+            <Card title={t("programs.ai_notes_title")}>
+              <textarea class={`${inputCls} h-16`} value={notes}
+                placeholder={t("programs.ai_notes_ph")}
+                onInput={(e) => setNotes(e.target.value)} />
+            </Card>
+          )}
+          {reviewText && (
+            <Card title={t("programs.review_title")}>
+              <p class="text-sm whitespace-pre-wrap">{reviewText}</p>
+            </Card>
+          )}
+          <div class="flex gap-2 items-center flex-wrap">
+            <button class={btnCls} disabled={busy} onClick={() => generate("rules")}>
               🪄 {t("programs.generate")}
             </button>
+            {ai.available && (
+              <button class="rounded-lg bg-violet-600 hover:bg-violet-700 text-white px-4 py-2 text-sm font-medium disabled:opacity-50"
+                disabled={busy} onClick={() => generate("ai")}>
+                ✨ {t("programs.generate_ai")}
+              </button>
+            )}
+            {ai.available && programs.length > 0 && (
+              <button class={btnGray} disabled={busy} onClick={askReview}>
+                🔍 {t("programs.review_btn")}
+              </button>
+            )}
             <span class="text-sm">{msg}</span>
           </div>
         </div>

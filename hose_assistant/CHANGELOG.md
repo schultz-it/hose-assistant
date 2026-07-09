@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.9.0
+- AI program generator (Milestone 9, optional): providers ha_conversation
+  (your HA conversation agent, zero extra keys), anthropic or openai (API key
+  in add-on options; optional ai_model override). The model receives config,
+  zones, balance history, climate boundaries, the rule-based baseline and
+  your free-text notes; must return strict JSON (validated, one retry, then
+  automatic fallback to the rule-based proposal with a clear message).
+- "Ask AI to review": plain-text suggestions comparing current programs with
+  zones, climate and actual water-balance history.
+- AI output is ALWAYS a proposal requiring your approval; AI never actuates
+  valves.
+- Programs tab: "Generate with AI" + notes field + review button (hidden
+  when no provider is configured).
+
 ## 0.8.1
 - Weather entity is now actually used (SPEC 6.1): its daily forecast
   precipitation overrides the Open-Meteo FORECAST rain in the daily

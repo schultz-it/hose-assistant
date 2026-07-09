@@ -1,5 +1,5 @@
 name: Hose Assistant
-version: "0.8.1"
+version: "0.9.0"
 slug: hose_assistant
 description: Smart irrigation calculator & controller — ET-based, weather-aware, AI-assisted.
 url: https://github.com/schultz-it/hose-assistant
@@ -19,7 +19,9 @@ options:
   log_level: info
   ai_provider: none
   ai_api_key: ""
+  ai_model: ""
 schema:
   log_level: list(debug|info|warning|error)
   ai_provider: list(none|ha_conversation|anthropic|openai)
   ai_api_key: str?
+  ai_model: str?

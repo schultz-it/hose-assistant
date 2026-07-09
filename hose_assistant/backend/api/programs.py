@@ -6,7 +6,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from .. import models, schemas
-from ..core import generator_rules
+from ..core import generator_ai, generator_rules
 from ..db import get_db
 from .config import ensure_config
 
@@ -14,25 +14,61 @@ router = APIRouter(prefix="/api/programs", tags=["programs"])
 
 
 class GenerateRequest(BaseModel):
-    engine: str = "rules"  # "ai" arrives with Milestone 9
+    engine: str = "rules"  # or "ai"
     notes: str | None = None
+
+
+@router.get("/ai_info")
+def ai_info() -> dict:
+    """Which AI provider (if any) is configured in the add-on options."""
+    return generator_ai.provider_info()
 
 
 @router.post("/generate")
 async def generate_programs(req: GenerateRequest, db: Session = Depends(get_db)) -> dict:
-    """Build a PROPOSAL of seasonal programs from the local climate.
+    """Build a PROPOSAL of seasonal programs (rules or AI).
 
     Nothing is persisted: the client previews the result and calls /apply.
+    AI failures fall back to the rule-based proposal with a clear message
+    (SPEC 7.2). AI never actuates anything.
     """
-    if req.engine != "rules":
-        raise HTTPException(status_code=400, detail="Only engine=rules is available (AI: M9)")
+    if req.engine not in ("rules", "ai"):
+        raise HTTPException(status_code=400, detail="engine must be 'rules' or 'ai'")
     cfg = ensure_config(db)
     if cfg.latitude is None or cfg.longitude is None:
         raise HTTPException(status_code=400, detail="Location not configured")
     try:
-        return await generator_rules.generate(cfg.latitude, cfg.longitude)
+        rules_out = await generator_rules.generate(cfg.latitude, cfg.longitude)
     except httpx.HTTPError as exc:
         raise HTTPException(status_code=502, detail=f"Open-Meteo archive unreachable: {exc}")
+    if req.engine == "rules":
+        return {**rules_out, "engine_used": "rules"}
+    try:
+        ai_out = await generator_ai.generate(db, cfg, rules_out, req.notes)
+        return {**ai_out, "climate": rules_out.get("climate")}
+    except Exception as exc:  # noqa: BLE001 — any AI failure -> rules fallback
+        return {
+            **rules_out,
+            "engine_used": "rules_fallback",
+            "explanation": f"AI generation failed ({exc}). Showing the "
+                           f"rule-based proposal instead. {rules_out['explanation']}",
+        }
+
+
+@router.post("/review")
+async def review_programs(req: GenerateRequest, db: Session = Depends(get_db)) -> dict:
+    """'Ask AI to review' current programs vs config and balance history."""
+    cfg = ensure_config(db)
+    if cfg.latitude is None or cfg.longitude is None:
+        raise HTTPException(status_code=400, detail="Location not configured")
+    if not generator_ai.provider_info()["available"]:
+        raise HTTPException(status_code=400, detail="No AI provider configured")
+    try:
+        rules_out = await generator_rules.generate(cfg.latitude, cfg.longitude)
+        text = await generator_ai.review(db, cfg, rules_out, req.notes)
+    except Exception as exc:  # noqa: BLE001
+        raise HTTPException(status_code=502, detail=f"AI review failed: {exc}")
+    return {"review": text}
 
 
 @router.post("/apply")
@@ -40,12 +76,12 @@ def apply_programs(
     programs: list[schemas.ProgramCreate] = Body(embed=True),
     db: Session = Depends(get_db),
 ) -> list[schemas.ProgramRead]:
-    """Persist an applied proposal: replaces previous rules-generated programs.
+    """Persist an applied proposal: replaces previously generated programs.
 
-    Manually created/edited programs (generated_by != 'rules') are untouched.
+    Manually created/edited programs (generated_by == 'manual') are untouched.
     """
     for old in db.scalars(
-        select(models.Program).where(models.Program.generated_by == "rules")
+        select(models.Program).where(models.Program.generated_by.in_(["rules", "ai"]))
     ).all():
         db.delete(old)
     created = [models.Program(**p.model_dump()) for p in programs]
