@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.1
+- Brand identity: new icon and logo (white droplet with a negative-space
+  house — Home Assistant living inside the water).
+- Dashboard UX: the soil-reservoir bar now shows WATER LEFT (full = fine,
+  empty = dry, blue fill) instead of the counter-intuitive deficit bar.
+
 ## 1.0.0 🎉
 - First stable release.
 - Italian translation (`it.json`) + language picker in Setup (English stays

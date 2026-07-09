@@ -83,18 +83,20 @@ export function Dashboard() {
 
       <Card title={t("dash.reservoir")}>
         {st.zones.map((z) => {
-          const pct = z.taw_mm ? Math.min(100, (z.deficit_mm / z.taw_mm) * 100) : 0;
+          // The bar shows WATER LEFT in the soil: full = fine, empty = dry.
+          const left = Math.max(0, z.taw_mm - z.deficit_mm);
+          const pct = z.taw_mm ? Math.min(100, (left / z.taw_mm) * 100) : 0;
           const dry = z.deficit_mm >= z.trigger_mm;
           return (
             <div key={z.id} class="mb-2">
               <div class="flex justify-between text-sm">
                 <span>{z.name}</span>
                 <span class={dry ? "text-amber-500" : "text-gray-500"}>
-                  {z.deficit_mm}/{z.taw_mm} mm {dry ? `· ${t("dash.dry")}` : ""}
+                  💧 {left.toFixed(1)}/{z.taw_mm} mm{dry ? ` · ${t("dash.dry")}` : ""}
                 </span>
               </div>
               <div class="h-2 rounded bg-gray-200 dark:bg-gray-800 overflow-hidden">
-                <div class={`h-full ${dry ? "bg-amber-500" : "bg-emerald-500"}`}
+                <div class={`h-full ${dry ? "bg-amber-500" : "bg-sky-500"}`}
                   style={{ width: `${pct}%` }} />
               </div>
             </div>
