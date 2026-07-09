@@ -114,11 +114,29 @@ class Executor:
         return True
 
     async def run_schedule(self, run_ids: list[int]) -> bool:
-        """Execute planned Schedule rows (already ordered)."""
+        """Execute planned Schedule rows (already ordered).
+
+        Re-checks system state at execution time: an OFF switch or a rain
+        delay set AFTER planning must still stop the run.
+        """
         if self.busy:
             return False
         with SessionLocal() as db:
+            cfg = db.get(models.SystemConfig, 1)
+            blocked = None
+            if cfg and not cfg.system_enabled:
+                blocked = "system OFF"
+            elif cfg and cfg.rain_delay_until and cfg.rain_delay_until > datetime.now():
+                blocked = f"rain delay until {cfg.rain_delay_until:%H:%M %d/%m}"
             rows = [db.get(models.Schedule, rid) for rid in run_ids]
+            if blocked:
+                for r in rows:
+                    if r and r.status == "planned":
+                        r.status = "skipped"
+                        r.skip_reason = blocked
+                eng.log_event(db, "info", f"Planned runs skipped: {blocked}")
+                db.commit()
+                return True
             pairs = [(r.zone_id, r.duration_min) for r in rows if r and r.status == "planned"]
             ids = [r.id for r in rows if r and r.status == "planned"]
         self._task = asyncio.create_task(self._session(pairs, ids))

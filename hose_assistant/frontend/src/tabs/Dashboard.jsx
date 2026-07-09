@@ -114,10 +114,19 @@ export function Dashboard() {
               {" · "}{Math.round(r.duration_min)} {t("common.minutes")}
             </span>
             {r.status === "planned" && (
-              <button class="text-xs text-gray-400 hover:text-red-500"
-                onClick={() => act(() => post(`api/schedule/${r.id}/skip`))}>
-                {t("dash.skip")}
-              </button>
+              <span class="flex gap-2">
+                <button class="text-xs text-gray-400 hover:text-emerald-500"
+                  onClick={() => {
+                    const m = prompt(t("dash.override_prompt"), Math.round(r.duration_min));
+                    if (m) act(() => post(`api/schedule/${r.id}/override?minutes=${m}`));
+                  }}>
+                  ✎ {Math.round(r.duration_min)}'
+                </button>
+                <button class="text-xs text-gray-400 hover:text-red-500"
+                  onClick={() => act(() => post(`api/schedule/${r.id}/skip`))}>
+                  {t("dash.skip")}
+                </button>
+              </span>
             )}
           </div>
         ))}
@@ -153,6 +162,32 @@ export function Dashboard() {
             ⏹ {t("dash.stop_all")}
           </button>
           <span class="text-sm">{msg}</span>
+        </div>
+        <div class="flex gap-2 items-center flex-wrap mt-3 pt-3 border-t border-gray-200 dark:border-gray-800">
+          <button
+            class={`rounded-lg px-4 py-2 text-sm font-semibold ${
+              st.system_enabled
+                ? "bg-gray-200 dark:bg-gray-700"
+                : "bg-emerald-600 text-white"
+            }`}
+            onClick={() =>
+              act(() => post(st.system_enabled ? "api/system/off" : "api/system/on"))
+            }>
+            {st.system_enabled ? `⏻ ${t("dash.turn_off")}` : `⏻ ${t("dash.turn_on")}`}
+          </button>
+          <span class="text-sm text-gray-500">🌧️ {t("dash.rain_delay_btn")}:</span>
+          {[24, 48, 72].map((h) => (
+            <button key={h} class={btnGray}
+              onClick={() => act(() => post(`api/system/rain_delay?hours=${h}`))}>
+              {h}h
+            </button>
+          ))}
+          {st.rain_delay_until && (
+            <button class="text-xs text-red-500 underline"
+              onClick={() => act(() => post("api/system/rain_delay?hours=0"))}>
+              {t("dash.rain_delay_cancel")}
+            </button>
+          )}
         </div>
       </Card>
 

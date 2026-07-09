@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.7.0
+- Operational controls (Milestone 7): System ON/OFF master toggle (OFF also
+  stops any run in progress), rain delay 24/48/72h with cancel, per-run
+  duration override from the dashboard.
+- Safety: planned runs are re-checked at execution time — a system OFF or a
+  rain delay set after planning skips them (with reason in the schedule).
+- Endpoints: POST /api/system/on|off, /api/system/rain_delay?hours=,
+  /api/schedule/{id}/override?minutes=.
+
 ## 0.6.0
 - Rule-based program generator (Milestone 6): analyzes 5 years of local
   Open-Meteo climate, derives season boundaries from the ET0 curve (spring

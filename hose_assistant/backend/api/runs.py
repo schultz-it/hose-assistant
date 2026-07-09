@@ -146,6 +146,56 @@ async def stop_all(db: Session = Depends(get_db)) -> dict:
     return {"status": "stopped", "detail": "all valves closed"}
 
 
+@router.post("/system/on")
+def system_on(db: Session = Depends(get_db)) -> dict:
+    cfg = ensure_config(db)
+    cfg.system_enabled = True
+    eng.log_event(db, "info", "System switched ON")
+    db.commit()
+    return {"system_enabled": True}
+
+
+@router.post("/system/off")
+async def system_off(db: Session = Depends(get_db)) -> dict:
+    """Master OFF: also stops any run in progress (SPEC dashboard controls)."""
+    cfg = ensure_config(db)
+    cfg.system_enabled = False
+    eng.log_event(db, "info", "System switched OFF")
+    db.commit()
+    await executor.stop_all()
+    return {"system_enabled": False}
+
+
+@router.post("/system/rain_delay")
+def rain_delay(hours: int = Query(ge=0, le=168), db: Session = Depends(get_db)) -> dict:
+    """Pause planning for N hours (0 cancels the delay)."""
+    from datetime import timedelta
+
+    cfg = ensure_config(db)
+    cfg.rain_delay_until = (datetime.now() + timedelta(hours=hours)) if hours else None
+    eng.log_event(db, "info",
+                  f"Rain delay {'set: ' + str(hours) + 'h' if hours else 'cancelled'}")
+    db.commit()
+    return {"rain_delay_until": cfg.rain_delay_until.isoformat() if cfg.rain_delay_until else None}
+
+
+@router.post("/schedule/{run_id}/override")
+def override_run(run_id: int, minutes: float = Query(gt=0, le=240),
+                 db: Session = Depends(get_db)) -> dict:
+    """Override the duration of a planned run (SPEC: per-run edit)."""
+    row = db.get(models.Schedule, run_id)
+    if row is None:
+        raise HTTPException(status_code=404, detail="Run not found")
+    if row.status != "planned":
+        raise HTTPException(status_code=409, detail=f"Run is {row.status}, not planned")
+    zone = db.get(models.Zone, row.zone_id)
+    minutes = min(minutes, float(zone.max_runtime_min)) if zone else minutes
+    row.duration_min = minutes
+    eng.log_event(db, "info", f"Run {run_id} duration overridden to {minutes:g} min")
+    db.commit()
+    return {"id": run_id, "duration_min": minutes}
+
+
 @router.post("/engine/recalc")
 async def engine_recalc(db: Session = Depends(get_db)) -> dict:
     """Run the daily pipeline on demand (weather -> deficits -> plan)."""
