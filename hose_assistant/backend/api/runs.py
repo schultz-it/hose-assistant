@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 
 from .. import models
 from ..core import engine as eng
+from ..core import ha as ha_client
 from ..core import scheduler as sched
 from ..core import soil, weather
 from ..core.executor import executor
@@ -207,6 +208,16 @@ async def engine_recalc(db: Session = Depends(get_db)) -> dict:
     except httpx.HTTPError as exc:
         raise HTTPException(status_code=502, detail=f"Open-Meteo unreachable: {exc}")
     today_iso = date.today().isoformat()
+    if cfg.weather_entity:
+        try:
+            ha_rain = await ha_client.get_weather_daily_rain(cfg.weather_entity)
+            daily = eng.merge_forecast_rain(daily, ha_rain, today_iso)
+            eng.log_event(db, "info",
+                          f"Forecast rain from {cfg.weather_entity} ({len(ha_rain)} days)")
+        except Exception as exc:  # noqa: BLE001
+            eng.log_event(db, "warning",
+                          f"Weather entity {cfg.weather_entity} unreadable ({exc!r}); "
+                          f"using Open-Meteo forecast")
     eng.fill_balance(db, [d for d in daily if d["date"] < today_iso])
     eng.update_deficits(db, cfg)
     for row in db.scalars(

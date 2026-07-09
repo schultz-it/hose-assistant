@@ -18,6 +18,7 @@ from sqlalchemy.orm import Session
 
 from .. import models
 from ..core import engine as eng
+from ..core import ha as ha_client
 from ..core import sun, weather
 from ..db import get_db
 from .config import ensure_config
@@ -59,6 +60,33 @@ async def weather_summary(db: Session = Depends(get_db)) -> dict:
         "today": today,
         "sun": sun_today,
         "daily": [{**d, "is_forecast": d["date"] >= today} for d in daily],
+    }
+
+
+@router.get("/weather/entity_test")
+async def weather_entity_test(db: Session = Depends(get_db)) -> dict:
+    """Read the configured HA weather entity and show what the engine gets."""
+    cfg = ensure_config(db)
+    if not cfg.weather_entity:
+        raise HTTPException(status_code=400, detail="No weather entity configured")
+    try:
+        state = await ha_client.get_state(cfg.weather_entity)
+        if state is None:
+            raise HTTPException(status_code=404,
+                                detail=f"Entity {cfg.weather_entity} not found in HA")
+        rain = await ha_client.get_weather_daily_rain(cfg.weather_entity)
+    except HTTPException:
+        raise
+    except Exception as exc:  # noqa: BLE001
+        raise HTTPException(status_code=502,
+                            detail=f"Could not read {cfg.weather_entity}: {exc!r}")
+    return {
+        "entity": cfg.weather_entity,
+        "state": state.get("state"),
+        "forecast_days": len(rain),
+        "daily_rain_mm": rain,
+        "note": "These values override the Open-Meteo FORECAST rain in the "
+                "daily calculation (past actuals stay Open-Meteo).",
     }
 
 

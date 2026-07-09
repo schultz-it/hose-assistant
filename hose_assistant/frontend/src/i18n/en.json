@@ -26,7 +26,8 @@
   "setup.daily_calc": "Daily calculation time",
   "setup.rain_skip": "Skip if rain forecast ≥ (mm/24h)",
   "setup.wind_skip": "Skip spray zones if wind ≥ (km/h, empty = off)",
-  "setup.weather_entity": "HA weather entity (optional)",
+  "setup.weather_entity": "HA weather entity (optional — overrides forecast rain)",
+  "setup.weather_test": "Test",
   "setup.expose": "Expose entities to Home Assistant",
   "setup.expose_hint": "Per-zone deficit & next-run sensors, active zone/program, plus a system switch and intensity number — via MQTT discovery if a broker is available (REST read-only sensors otherwise). Takes effect within a minute.",
 

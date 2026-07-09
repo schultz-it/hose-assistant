@@ -8,6 +8,10 @@ Hose Assistant is a Home Assistant **add-on** that calculates, schedules and exe
 
 ## Installation
 
+[![Add repository to my Home Assistant](https://my.home-assistant.io/badges/supervisor_add_addon_repository.svg)](https://my.home-assistant.io/redirect/supervisor_add_addon_repository/?repository_url=https%3A%2F%2Fgithub.com%2Fschultz-it%2Fhose-assistant)
+
+Click the badge above, or manually:
+
 1. In Home Assistant: **Settings → Add-ons → Add-on Store → ⋮ → Repositories**
 2. Add: `https://github.com/schultz-it/hose-assistant`
 3. Install **Hose Assistant** and start it. Open the UI from the sidebar.

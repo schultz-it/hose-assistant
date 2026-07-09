@@ -55,6 +55,29 @@ async def turn_off(entity_id: str) -> None:
     await call_on_off(entity_id, False)
 
 
+async def get_weather_daily_rain(entity_id: str) -> list[dict]:
+    """Daily precipitation forecast from an HA ``weather.*`` entity.
+
+    Uses the ``weather.get_forecasts`` service (with response) through the
+    Supervisor proxy. Returns ``[{date, rain_mm}, ...]``.
+    """
+    async with httpx.AsyncClient(timeout=TIMEOUT) as client:
+        resp = await client.post(
+            f"{SUPERVISOR}/services/weather/get_forecasts?return_response",
+            headers=_headers(),
+            json={"entity_id": entity_id, "type": "daily"},
+        )
+    resp.raise_for_status()
+    body = resp.json()
+    forecast = (body.get("service_response", {}).get(entity_id, {}) or {}).get("forecast", [])
+    out = []
+    for f in forecast:
+        day = (f.get("datetime") or "")[:10]
+        if day:
+            out.append({"date": day, "rain_mm": float(f.get("precipitation") or 0.0)})
+    return out
+
+
 def turn_off_sync(entity_id: str) -> None:
     """Blocking turn-off — used by persisted watchdog jobs (APScheduler)."""
     domain, service = _service_for(entity_id, False)

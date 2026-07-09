@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.8.1
+- Weather entity is now actually used (SPEC 6.1): its daily forecast
+  precipitation overrides the Open-Meteo FORECAST rain in the daily
+  calculation and rain-skip decisions (past actuals stay Open-Meteo).
+  Unreadable entity -> logged warning + Open-Meteo fallback.
+- "Test" button next to the weather entity field: shows the entity state and
+  the next days' rain as the engine will see them
+  (GET /api/weather/entity_test).
+- README: one-click "Add repository to my Home Assistant" badge.
+
 ## 0.8.0
 - HA entity exposure (Milestone 8, opt-in from Setup): per-zone deficit and
   next-run sensors, active zone/program sensors, plus a bidirectional system

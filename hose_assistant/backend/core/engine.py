@@ -102,6 +102,22 @@ def record_irrigation(db: Session, zone_id: int, mm: float, on_date: date | None
     db.flush()
 
 
+def merge_forecast_rain(daily: list[dict], ha_rain: list[dict],
+                        today_iso: str) -> list[dict]:
+    """Override FORECAST rain with the HA weather entity's values (SPEC 6.1).
+
+    Past days keep Open-Meteo actuals; only dates >= today are replaced,
+    and only where the entity actually provides that date.
+    """
+    by_date = {r["date"]: r["rain_mm"] for r in ha_rain}
+    out = []
+    for d in daily:
+        if d["date"] >= today_iso and d["date"] in by_date:
+            d = {**d, "rain_mm": by_date[d["date"]]}
+        out.append(d)
+    return out
+
+
 # ------------------------------------------------------------------ programs
 
 def _mmdd_in_range(d: date, start: str, end: str) -> bool:

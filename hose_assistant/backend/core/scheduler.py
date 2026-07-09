@@ -20,7 +20,7 @@ from .. import models
 from ..db import DATA_DIR, SessionLocal
 from . import engine as eng
 from . import executor as ex
-from . import weather
+from . import ha, weather
 
 log = logging.getLogger(__name__)
 
@@ -84,6 +84,18 @@ async def daily_calc() -> None:
             db.commit()
             return
         today_iso = date.today().isoformat()
+        # SPEC 6.1: an HA weather entity, if set, overrides the FORECAST rain.
+        if cfg.weather_entity:
+            try:
+                ha_rain = await ha.get_weather_daily_rain(cfg.weather_entity)
+                daily = eng.merge_forecast_rain(daily, ha_rain, today_iso)
+                eng.log_event(db, "info",
+                              f"Forecast rain from {cfg.weather_entity} "
+                              f"({len(ha_rain)} days)")
+            except Exception as exc:  # noqa: BLE001
+                eng.log_event(db, "warning",
+                              f"Weather entity {cfg.weather_entity} unreadable "
+                              f"({exc!r}); using Open-Meteo forecast")
         eng.fill_balance(db, [d for d in daily if d["date"] < today_iso])
         eng.update_deficits(db, cfg)
         # Drop stale planned rows for today, then re-plan.

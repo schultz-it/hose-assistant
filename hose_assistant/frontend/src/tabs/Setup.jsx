@@ -96,8 +96,24 @@ export function Setup() {
           </Field>
         </div>
         <Field label={t("setup.weather_entity")}>
-          <input class={inputCls} value={cfg.weather_entity ?? ""}
-            onInput={set("weather_entity")} placeholder="weather.home" />
+          <div class="flex gap-2">
+            <input class={inputCls} value={cfg.weather_entity ?? ""}
+              onInput={set("weather_entity")} placeholder="weather.home" />
+            <button class="rounded-lg bg-gray-200 dark:bg-gray-700 px-3 text-sm shrink-0"
+              onClick={async () => {
+                setMsg("…");
+                try {
+                  const r = await get("api/weather/entity_test");
+                  const next = r.daily_rain_mm.slice(0, 3)
+                    .map((d) => `${d.date.slice(5)}: ${d.rain_mm}mm`).join(" · ");
+                  setMsg(`✓ ${r.entity} (${r.state}) — ${next}`);
+                } catch (e) {
+                  setMsg(`✗ ${e.message}`);
+                }
+              }}>
+              {t("setup.weather_test")}
+            </button>
+          </div>
         </Field>
         <label class="flex items-center gap-2 mb-3 text-sm">
           <input type="checkbox" checked={cfg.expose_entities}
