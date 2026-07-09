@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.0
+- Seven more UI languages: French, German, Spanish, Portuguese, Chinese,
+  Japanese and Arabic (now 9 total with English + Italian). Pick one in
+  Setup → Language.
+- Arabic renders right-to-left: the whole layout mirrors automatically.
+
 ## 1.0.3
 - Backup & restore from the Setup tab: export all settings and history
   (config, zones, programs, water-balance, schedule, event log) to a JSON

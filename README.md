@@ -24,7 +24,7 @@ Click the badge above, or manually:
 - Forecast rain skip, soil-moisture & rain-sensor skip, wind skip, rain delay, global intensity slider
 - Hard hardware failsafes on every valve actuation
 - Optional native HA entities via MQTT discovery
-- English UI & docs, Italian translation included, fully translatable (i18n)
+- UI in 9 languages (EN, IT, FR, DE, ES, PT, ZH, JA, AR incl. right-to-left); docs in English; fully translatable (i18n)
 
 ## License
 
