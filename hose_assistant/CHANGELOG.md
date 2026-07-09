@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.6.0
+- Rule-based program generator (Milestone 6): analyzes 5 years of local
+  Open-Meteo climate, derives season boundaries from the ET0 curve (spring
+  ≥2 mm/day, summer ≥4, etc. — not fixed dates) and proposes Lawn Start +
+  Spring/Summer/Autumn (or a single season program in mild climates).
+  Generate → preview with explanation → apply; re-applying replaces previous
+  rules-generated programs, manual ones untouched.
+- Programs tab: generate/preview/apply flow + program editor (dates, window,
+  MAD, ET multiplier, priority, manual-only). Editing flips the badge to
+  "manual".
+- Endpoints: POST /api/programs/generate, POST /api/programs/apply.
+
 ## 0.5.1
 - Richer irrigation types: fixed spray, rotor, MP rotator, micro-spray,
   surface drip, buried drip (soaker hose ≈ drip; tree bubblers ≈ high-flow
