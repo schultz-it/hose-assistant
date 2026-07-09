@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.8.0
+- HA entity exposure (Milestone 8, opt-in from Setup): per-zone deficit and
+  next-run sensors, active zone/program sensors, plus a bidirectional system
+  switch and watering-intensity number — all grouped under one "Hose
+  Assistant" device.
+- Primary path MQTT discovery (broker auto-detected via Supervisor services
+  API, availability topic, retained states, commands from HA honored);
+  fallback to REST read-only sensors when no broker is available.
+- Refresh every 60 s; toggle takes effect within a minute.
+
 ## 0.7.0
 - Operational controls (Milestone 7): System ON/OFF master toggle (OFF also
   stops any run in progress), rain delay 24/48/72h with cancel, per-run

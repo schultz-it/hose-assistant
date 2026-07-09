@@ -45,6 +45,7 @@ class ConfigRead(BaseModel):
     forecast_rain_skip_mm: float = 5.0
     wind_skip_kmh: Optional[float] = None
     language: str = "en"
+    expose_entities: bool = False
 
 
 class ConfigUpdate(BaseModel):
@@ -65,6 +66,7 @@ class ConfigUpdate(BaseModel):
     forecast_rain_skip_mm: Optional[float] = Field(default=None, ge=0)
     wind_skip_kmh: Optional[float] = None
     language: Optional[str] = None
+    expose_entities: Optional[bool] = None
 
 
 # =============================== Zone ===============================

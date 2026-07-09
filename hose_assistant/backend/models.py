@@ -33,6 +33,8 @@ class SystemConfig(Base):
     forecast_rain_skip_mm: Mapped[float] = mapped_column(Float, default=5.0)
     wind_skip_kmh: Mapped[float | None] = mapped_column(Float, nullable=True)
     language: Mapped[str] = mapped_column(String, default="en")
+    # SPEC 11: opt-in exposure of sensors/switch/number back into HA
+    expose_entities: Mapped[bool] = mapped_column(Boolean, default=False)
 
 
 class Zone(Base):

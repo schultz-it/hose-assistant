@@ -35,6 +35,7 @@ export function Setup() {
         forecast_rain_skip_mm: parseFloat(cfg.forecast_rain_skip_mm || 5),
         wind_skip_kmh: cfg.wind_skip_kmh != null ? parseFloat(cfg.wind_skip_kmh) : null,
         weather_entity: cfg.weather_entity,
+        expose_entities: !!cfg.expose_entities,
       });
       setCfg(updated);
       setMsg(`${t("common.saved")} ✓`);
@@ -98,6 +99,15 @@ export function Setup() {
           <input class={inputCls} value={cfg.weather_entity ?? ""}
             onInput={set("weather_entity")} placeholder="weather.home" />
         </Field>
+        <label class="flex items-center gap-2 mb-3 text-sm">
+          <input type="checkbox" checked={cfg.expose_entities}
+            onChange={(e) => {
+              const v = e.target.checked;
+              setCfg((prev) => ({ ...prev, expose_entities: v }));
+            }} />
+          {t("setup.expose")}
+        </label>
+        <p class="text-xs text-gray-500 -mt-2 mb-3">{t("setup.expose_hint")}</p>
         <div class="flex items-center gap-3">
           <button class={btnCls} onClick={save}>{t("common.save")}</button>
           <span class="text-sm">{msg}</span>

@@ -38,6 +38,11 @@ def init() -> AsyncIOScheduler:
     ex.set_scheduler(scheduler)
     scheduler.start()
     reschedule_daily_calc()
+    # SPEC 11: entity exposure tick (no-op unless enabled in Setup).
+    from . import expose
+
+    scheduler.add_job(expose.refresh_job, "interval", seconds=60,
+                      id="expose_refresh", replace_existing=True)
     return scheduler
 
 

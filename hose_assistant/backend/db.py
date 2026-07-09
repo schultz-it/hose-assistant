@@ -43,6 +43,7 @@ _MIGRATIONS: list[tuple[str, str, str]] = [
     ("zones", "emitter_spacing_cm", "FLOAT"),
     ("zones", "line_length_m", "FLOAT"),
     ("zones", "cover", "VARCHAR DEFAULT 'none'"),
+    ("system_config", "expose_entities", "BOOLEAN DEFAULT 0"),
 ]
 
 

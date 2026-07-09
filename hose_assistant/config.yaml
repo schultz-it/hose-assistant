@@ -1,5 +1,5 @@
 name: Hose Assistant
-version: "0.7.0"
+version: "0.8.0"
 slug: hose_assistant
 description: Smart irrigation calculator & controller — ET-based, weather-aware, AI-assisted.
 url: https://github.com/schultz-it/hose-assistant
@@ -13,6 +13,8 @@ panel_icon: mdi:sprinkler-variant
 panel_title: Hose Assistant
 hassio_api: true
 homeassistant_api: true
+services:
+  - mqtt:want
 options:
   log_level: info
   ai_provider: none
