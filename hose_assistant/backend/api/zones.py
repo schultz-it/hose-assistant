@@ -4,6 +4,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from .. import models, schemas
+from ..core import scheduler as sched
 from ..db import get_db
 
 router = APIRouter(prefix="/api/zones", tags=["zones"])
@@ -22,11 +23,13 @@ def list_zones(db: Session = Depends(get_db)):
 
 
 @router.post("", response_model=schemas.ZoneRead, status_code=201)
-def create_zone(payload: schemas.ZoneCreate, db: Session = Depends(get_db)):
+async def create_zone(payload: schemas.ZoneCreate, db: Session = Depends(get_db)):
     zone = models.Zone(**payload.model_dump())
     db.add(zone)
     db.commit()
     db.refresh(zone)
+    # Auto-recalc: a new zone changes the plan (SPEC scheduling stays fresh).
+    await sched.try_recalc(db, "zone created")
     return zone
 
 
@@ -36,17 +39,19 @@ def get_zone(zone_id: int, db: Session = Depends(get_db)):
 
 
 @router.put("/{zone_id}", response_model=schemas.ZoneRead)
-def update_zone(zone_id: int, payload: schemas.ZoneUpdate, db: Session = Depends(get_db)):
+async def update_zone(zone_id: int, payload: schemas.ZoneUpdate, db: Session = Depends(get_db)):
     zone = _get_or_404(db, zone_id)
     for field, value in payload.model_dump(exclude_unset=True).items():
         setattr(zone, field, value)
     db.commit()
     db.refresh(zone)
+    await sched.try_recalc(db, "zone updated")
     return zone
 
 
 @router.delete("/{zone_id}", status_code=204)
-def delete_zone(zone_id: int, db: Session = Depends(get_db)):
+async def delete_zone(zone_id: int, db: Session = Depends(get_db)):
     zone = _get_or_404(db, zone_id)
     db.delete(zone)
     db.commit()
+    await sched.try_recalc(db, "zone deleted")

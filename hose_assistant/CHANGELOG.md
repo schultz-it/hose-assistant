@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.2.0
+- Auto-recalculate the plan after saving: creating/editing/deleting a zone,
+  or applying a program set, now triggers the same weather -> deficit ->
+  plan pipeline as the nightly run — no need to press "Recalculate plan"
+  by hand anymore (the manual button is still there for whenever you want
+  it, e.g. after a reservoir reset).
+  - Best-effort: if the weather service is briefly unreachable, the save
+    still succeeds and a warning is logged — it never blocks your edit.
+  - Internally, the recalc pipeline (previously duplicated between the
+    nightly cron and the manual endpoint) is now a single shared function.
+
 ## 1.1.3
 - Reservoir reset now goes both ways: two small buttons per zone — 100%
   (just watered / rain the model missed) and 0% (bone dry: forces watering

@@ -15,6 +15,7 @@ from datetime import date, datetime
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from sqlalchemy import select
+from sqlalchemy.orm import Session
 
 from .. import models
 from ..db import DATA_DIR, SessionLocal
@@ -69,8 +70,69 @@ def reschedule_daily_calc() -> None:
     log.info("Daily calc scheduled at %s", calc_time)
 
 
+async def run_recalc(db: Session, cfg: models.SystemConfig) -> list[models.Schedule]:
+    """The shared engine pipeline: weather -> balance -> deficits -> plan -> arm.
+
+    Used by the nightly cron, the manual "Recalculate plan" button, and the
+    auto-recalc triggered after saving a zone or program. Raises on weather
+    fetch failure (callers decide how to surface that); the optional HA
+    weather-entity override degrades to a logged warning instead.
+    """
+    daily = await weather.fetch_daily(cfg.latitude, cfg.longitude)  # may raise
+    today_iso = date.today().isoformat()
+    # SPEC 6.1: an HA weather entity, if set, overrides the FORECAST rain.
+    if cfg.weather_entity:
+        try:
+            ha_rain = await ha.get_weather_daily_rain(cfg.weather_entity)
+            daily = eng.merge_forecast_rain(daily, ha_rain, today_iso)
+            eng.log_event(db, "info",
+                          f"Forecast rain from {cfg.weather_entity} "
+                          f"({len(ha_rain)} days)")
+        except Exception as exc:  # noqa: BLE001
+            eng.log_event(db, "warning",
+                          f"Weather entity {cfg.weather_entity} unreadable "
+                          f"({exc!r}); using Open-Meteo forecast")
+    eng.fill_balance(db, [d for d in daily if d["date"] < today_iso])
+    eng.update_deficits(db, cfg)
+    # Drop stale planned rows, then re-plan from scratch.
+    for row in db.scalars(
+        select(models.Schedule).where(models.Schedule.status == "planned")
+    ).all():
+        db.delete(row)
+    created = eng.plan_today(db, cfg, daily)
+    db.commit()
+    if created and scheduler is not None:
+        first_start = min(r.start for r in created)
+        run_ids = [r.id for r in created]
+        scheduler.add_job(
+            execute_plan, "date",
+            run_date=max(first_start, datetime.now()),
+            args=[run_ids], id="execute_plan", replace_existing=True,
+            misfire_grace_time=3600,
+        )
+        log.info("Execution armed at %s for %d run(s)", first_start, len(created))
+    return created
+
+
+async def try_recalc(db: Session, reason: str) -> None:
+    """Best-effort recalc after a zone/program save — never raises.
+
+    Silently skipped if the location isn't set yet (e.g. still in the
+    first-run wizard); any weather/API failure is logged, not propagated,
+    so a save action never fails because of it.
+    """
+    cfg = db.get(models.SystemConfig, 1)
+    if cfg is None or cfg.latitude is None or cfg.longitude is None:
+        return
+    try:
+        await run_recalc(db, cfg)
+    except Exception as exc:  # noqa: BLE001
+        eng.log_event(db, "warning", f"Auto-recalc after {reason} failed: {exc!r}")
+        db.commit()
+
+
 async def daily_calc() -> None:
-    """The engine tick: weather -> balance -> deficits -> plan -> arm run."""
+    """Cron entry point: same pipeline as run_recalc, tolerant of no location."""
     with SessionLocal() as db:
         cfg = db.get(models.SystemConfig, 1)
         if cfg is None or cfg.latitude is None or cfg.longitude is None:
@@ -78,43 +140,10 @@ async def daily_calc() -> None:
             db.commit()
             return
         try:
-            daily = await weather.fetch_daily(cfg.latitude, cfg.longitude)
+            await run_recalc(db, cfg)
         except Exception as exc:  # noqa: BLE001
             eng.log_event(db, "error", f"Daily calc: weather fetch failed: {exc}")
             db.commit()
-            return
-        today_iso = date.today().isoformat()
-        # SPEC 6.1: an HA weather entity, if set, overrides the FORECAST rain.
-        if cfg.weather_entity:
-            try:
-                ha_rain = await ha.get_weather_daily_rain(cfg.weather_entity)
-                daily = eng.merge_forecast_rain(daily, ha_rain, today_iso)
-                eng.log_event(db, "info",
-                              f"Forecast rain from {cfg.weather_entity} "
-                              f"({len(ha_rain)} days)")
-            except Exception as exc:  # noqa: BLE001
-                eng.log_event(db, "warning",
-                              f"Weather entity {cfg.weather_entity} unreadable "
-                              f"({exc!r}); using Open-Meteo forecast")
-        eng.fill_balance(db, [d for d in daily if d["date"] < today_iso])
-        eng.update_deficits(db, cfg)
-        # Drop stale planned rows for today, then re-plan.
-        for row in db.scalars(
-            select(models.Schedule).where(models.Schedule.status == "planned")
-        ).all():
-            db.delete(row)
-        created = eng.plan_today(db, cfg, daily)
-        db.commit()
-        if created and scheduler is not None:
-            first_start = min(r.start for r in created)
-            run_ids = [r.id for r in created]
-            scheduler.add_job(
-                execute_plan, "date",
-                run_date=max(first_start, datetime.now()),
-                args=[run_ids], id="execute_plan", replace_existing=True,
-                misfire_grace_time=3600,
-            )
-            log.info("Execution armed at %s for %d run(s)", first_start, len(created))
 
 
 async def execute_plan(run_ids: list[int]) -> None:

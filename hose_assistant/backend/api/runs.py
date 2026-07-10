@@ -8,9 +8,8 @@ from sqlalchemy.orm import Session
 
 from .. import models
 from ..core import engine as eng
-from ..core import ha as ha_client
 from ..core import scheduler as sched
-from ..core import soil, weather
+from ..core import soil
 from ..core.executor import executor
 from ..db import get_db
 from .config import ensure_config
@@ -232,36 +231,9 @@ async def engine_recalc(db: Session = Depends(get_db)) -> dict:
     if cfg.latitude is None or cfg.longitude is None:
         raise HTTPException(status_code=400, detail="Location not configured")
     try:
-        daily = await weather.fetch_daily(cfg.latitude, cfg.longitude)
+        created = await sched.run_recalc(db, cfg)
     except httpx.HTTPError as exc:
         raise HTTPException(status_code=502, detail=f"Open-Meteo unreachable: {exc}")
-    today_iso = date.today().isoformat()
-    if cfg.weather_entity:
-        try:
-            ha_rain = await ha_client.get_weather_daily_rain(cfg.weather_entity)
-            daily = eng.merge_forecast_rain(daily, ha_rain, today_iso)
-            eng.log_event(db, "info",
-                          f"Forecast rain from {cfg.weather_entity} ({len(ha_rain)} days)")
-        except Exception as exc:  # noqa: BLE001
-            eng.log_event(db, "warning",
-                          f"Weather entity {cfg.weather_entity} unreadable ({exc!r}); "
-                          f"using Open-Meteo forecast")
-    eng.fill_balance(db, [d for d in daily if d["date"] < today_iso])
-    eng.update_deficits(db, cfg)
-    for row in db.scalars(
-        select(models.Schedule).where(models.Schedule.status == "planned")
-    ).all():
-        db.delete(row)
-    created = eng.plan_today(db, cfg, daily)
-    db.commit()
-    if created and sched.scheduler is not None:
-        run_ids = [r.id for r in created]
-        first_start = min(r.start for r in created)
-        sched.scheduler.add_job(
-            sched.execute_plan, "date", run_date=max(first_start, datetime.now()),
-            args=[run_ids], id="execute_plan", replace_existing=True,
-            misfire_grace_time=3600,
-        )
     return {
         "planned_runs": len(created),
         "runs": [{"zone_id": r.zone_id, "start": r.start.isoformat(),

@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 
 from .. import models, schemas
 from ..core import generator_ai, generator_rules
+from ..core import scheduler as sched
 from ..db import get_db
 from .config import ensure_config
 
@@ -72,7 +73,7 @@ async def review_programs(req: GenerateRequest, db: Session = Depends(get_db)) -
 
 
 @router.post("/apply")
-def apply_programs(
+async def apply_programs(
     programs: list[schemas.ProgramCreate] = Body(embed=True),
     db: Session = Depends(get_db),
 ) -> list[schemas.ProgramRead]:
@@ -89,6 +90,8 @@ def apply_programs(
     db.commit()
     for c in created:
         db.refresh(c)
+    # Auto-recalc: the active program may have changed -> replan today.
+    await sched.try_recalc(db, "programs applied")
     return created
 
 
@@ -121,7 +124,7 @@ def get_program(program_id: int, db: Session = Depends(get_db)):
 
 
 @router.put("/{program_id}", response_model=schemas.ProgramRead)
-def update_program(
+async def update_program(
     program_id: int, payload: schemas.ProgramUpdate, db: Session = Depends(get_db)
 ):
     program = _get_or_404(db, program_id)
@@ -129,11 +132,13 @@ def update_program(
         setattr(program, field, value)
     db.commit()
     db.refresh(program)
+    await sched.try_recalc(db, "program updated")
     return program
 
 
 @router.delete("/{program_id}", status_code=204)
-def delete_program(program_id: int, db: Session = Depends(get_db)):
+async def delete_program(program_id: int, db: Session = Depends(get_db)):
     program = _get_or_404(db, program_id)
     db.delete(program)
     db.commit()
+    await sched.try_recalc(db, "program deleted")
