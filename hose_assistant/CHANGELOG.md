@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.1
+- Brianzöö: the local dialect of Brianza joins the language picker (10 total),
+  lovingly translated — "FÈRMA TÜSS", "Aqua in de la tèra", "sütt".
+
 ## 1.1.0
 - Seven more UI languages: French, German, Spanish, Portuguese, Chinese,
   Japanese and Arabic (now 9 total with English + Italian). Pick one in

@@ -10,6 +10,7 @@ import pt from "./i18n/pt.json";
 import zh from "./i18n/zh.json";
 import ja from "./i18n/ja.json";
 import ar from "./i18n/ar.json";
+import brz from "./i18n/brz.json";
 
 export const LANGUAGES = {
   en: "English",
@@ -21,8 +22,9 @@ export const LANGUAGES = {
   zh: "中文",
   ja: "日本語",
   ar: "العربية",
+  brz: "Brianzöö",
 };
-const CATALOGS = { en, it, fr, de, es, pt, zh, ja, ar };
+const CATALOGS = { en, it, fr, de, es, pt, zh, ja, ar, brz };
 const RTL = new Set(["ar"]);
 
 let catalog = en;
