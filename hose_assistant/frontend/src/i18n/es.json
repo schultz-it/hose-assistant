@@ -135,5 +135,8 @@
   "dash.rain_delay_cancel": "cancelar pausa",
   "dash.override_prompt": "Nueva duración (minutos):",
   "dash.reset_reservoir": "Marcar reserva como llena (p. ej. tras riego manual)",
-  "dash.reset_confirm": "Marcar la reserva del suelo como llena"
+  "dash.reset_confirm": "Marcar la reserva del suelo como llena",
+  "dash.today": "Hoy",
+  "dash.tomorrow": "Mañana",
+  "dash.planned_runs": "riegos planificados"
 }

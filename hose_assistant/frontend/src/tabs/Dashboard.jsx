@@ -1,7 +1,25 @@
 import { useEffect, useRef, useState } from "preact/hooks";
 import { get, post, put } from "../api.js";
-import { t } from "../i18n.js";
+import { getLocale, t } from "../i18n.js";
 import { Card, inputCls, btnCls, btnGray } from "../app.jsx";
+
+const cap = (s) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s);
+
+// "Tuesday 16 February · 04:00", localized, with today/tomorrow prefix.
+function whenLabel(iso) {
+  const d = new Date(iso);
+  const loc = getLocale();
+  const time = d.toLocaleTimeString(loc, { hour: "2-digit", minute: "2-digit" });
+  const today = new Date();
+  const tomorrow = new Date();
+  tomorrow.setDate(today.getDate() + 1);
+  const sameDay = (a, b) => a.toDateString() === b.toDateString();
+  let day;
+  if (sameDay(d, today)) day = t("dash.today");
+  else if (sameDay(d, tomorrow)) day = t("dash.tomorrow");
+  else day = cap(d.toLocaleDateString(loc, { weekday: "long", day: "numeric", month: "long" }));
+  return `${day} · ${time}`;
+}
 
 const POLL_MS = 5000;
 
@@ -120,7 +138,7 @@ export function Dashboard() {
           <div key={r.id} class="flex items-center justify-between text-sm py-1">
             <span>
               {r.status === "running" ? "▶️ " : "🕐 "}
-              {zoneName(r.zone_id)} — {new Date(r.start).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+              {zoneName(r.zone_id)} — {r.status === "running" ? t("dash.running") : whenLabel(r.start)}
               {" · "}{Math.round(r.duration_min)} {t("common.minutes")}
             </span>
             {r.status === "planned" && (
@@ -164,7 +182,16 @@ export function Dashboard() {
             {t("dash.run")}
           </button>
           <button class={btnGray}
-            onClick={() => act(() => post("api/engine/recalc"))}>
+            onClick={async () => {
+              setMsg("…");
+              try {
+                const r = await post("api/engine/recalc");
+                setMsg(`✓ ${r.planned_runs} ${t("dash.planned_runs")}`);
+                refresh();
+              } catch (e) {
+                setMsg(`✗ ${e.message}`);
+              }
+            }}>
             {t("dash.recalc")}
           </button>
           <button class="rounded-lg bg-red-600 hover:bg-red-700 text-white px-4 py-2 text-sm font-semibold"

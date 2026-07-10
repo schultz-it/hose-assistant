@@ -26,15 +26,26 @@ export const LANGUAGES = {
 };
 const CATALOGS = { en, it, fr, de, es, pt, zh, ja, ar, brz };
 const RTL = new Set(["ar"]);
+// BCP-47 locale for date/time formatting (brz uses Italian conventions).
+const LOCALES = {
+  en: "en-US", it: "it-IT", fr: "fr-FR", de: "de-DE", es: "es-ES",
+  pt: "pt-PT", zh: "zh-CN", ja: "ja-JP", ar: "ar", brz: "it-IT",
+};
 
 let catalog = en;
+let locale = "en-US";
 
 export function setLang(lang) {
   catalog = CATALOGS[lang] ?? en;
+  locale = LOCALES[lang] ?? "en-US";
   // Right-to-left languages flip the whole document direction.
   const root = document.documentElement;
   root.setAttribute("dir", RTL.has(lang) ? "rtl" : "ltr");
   root.setAttribute("lang", CATALOGS[lang] ? lang : "en");
+}
+
+export function getLocale() {
+  return locale;
 }
 
 export function t(key) {

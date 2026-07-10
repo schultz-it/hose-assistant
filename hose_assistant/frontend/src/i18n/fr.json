@@ -135,5 +135,8 @@
   "dash.rain_delay_cancel": "annuler la pause",
   "dash.override_prompt": "Nouvelle durée (minutes) :",
   "dash.reset_reservoir": "Marquer le réservoir comme plein (ex. après arrosage manuel)",
-  "dash.reset_confirm": "Marquer le réservoir du sol comme plein"
+  "dash.reset_confirm": "Marquer le réservoir du sol comme plein",
+  "dash.today": "Aujourd'hui",
+  "dash.tomorrow": "Demain",
+  "dash.planned_runs": "arrosages prévus"
 }

@@ -151,6 +151,10 @@ class Executor:
             except (asyncio.CancelledError, Exception):  # noqa: BLE001
                 pass
         await self.close_everything("stop requested")
+        # A cancelled session leaves its current row 'running'; reconcile it.
+        with SessionLocal() as db:
+            eng.reconcile_interrupted_runs(db)
+            db.commit()
 
     async def _session(self, pairs: list[tuple[int, float]], run_ids: list[int] | None) -> None:
         """One irrigation session: master valve, zones in order, failsafes."""

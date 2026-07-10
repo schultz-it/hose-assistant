@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.1.2
+- Fix: runs left "running" by an add-on restart or stop no longer linger as
+  ghost entries in the dashboard (they showed as duplicate/stale upcoming
+  runs). Interrupted runs are reconciled on startup and on STOP ALL.
+- Upcoming runs now show the day and date (e.g. "Tuesday 16 February · 04:00",
+  or Today/Tomorrow), localized to the chosen language.
+- "Recalculate plan" now reports how many runs it planned (0 when the soil is
+  already full — that is normal).
+
 ## 1.1.1
 - Brianzöö: the local dialect of Brianza joins the language picker (10 total),
   lovingly translated — "FÈRMA TÜSS", "Aqua in de la tèra", "sütt".

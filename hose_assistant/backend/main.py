@@ -17,6 +17,7 @@ from fastapi.staticfiles import StaticFiles
 
 from . import models  # noqa: F401  (import registers the ORM models on Base)
 from .api import backup, config, programs, runs, weather, zones
+from .core import engine as eng
 from .core import scheduler as sched
 from .core.executor import executor
 from .db import Base, SessionLocal, apply_migrations, engine
@@ -33,7 +34,9 @@ async def lifespan(app: FastAPI):
     with SessionLocal() as db:
         if db.get(models.SystemConfig, 1) is None:
             db.add(models.SystemConfig(id=1))
-            db.commit()
+        # Runs left 'running' by a previous (killed) session must not linger.
+        eng.reconcile_interrupted_runs(db)
+        db.commit()
     sched.init()
     # SPEC failsafe: on add-on start, close all known valves ("clean slate").
     # Skipped outside HA (no SUPERVISOR_TOKEN) to keep local dev/tests quiet.

@@ -135,5 +135,8 @@
   "dash.rain_delay_cancel": "إلغاء التأجيل",
   "dash.override_prompt": "مدة جديدة (دقائق):",
   "dash.reset_reservoir": "وضع علامة أن المخزون ممتلئ (مثلاً بعد الري اليدوي)",
-  "dash.reset_confirm": "وضع علامة أن مخزون التربة ممتلئ"
+  "dash.reset_confirm": "وضع علامة أن مخزون التربة ممتلئ",
+  "dash.today": "اليوم",
+  "dash.tomorrow": "غدًا",
+  "dash.planned_runs": "عمليات مجدولة"
 }

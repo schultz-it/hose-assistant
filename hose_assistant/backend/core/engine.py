@@ -21,6 +21,26 @@ def log_event(db: Session, level: str, message: str, meta: dict | None = None) -
     log.log(logging.WARNING if level == "warning" else logging.INFO, message)
 
 
+def reconcile_interrupted_runs(db: Session) -> int:
+    """Mark runs left 'running' by a killed session as aborted.
+
+    A watering session sets a row to 'running' and back to 'done' when it
+    finishes. If the add-on restarts (or is stopped) mid-run, the row would
+    stay 'running' forever and linger in the dashboard — reconcile it here.
+    """
+    orphans = db.scalars(
+        select(models.Schedule).where(models.Schedule.status == "running")
+    ).all()
+    for row in orphans:
+        row.status = "aborted"
+        row.skip_reason = "interrupted"
+    if orphans:
+        log_event(db, "warning",
+                  f"{len(orphans)} interrupted run(s) marked aborted")
+    db.flush()
+    return len(orphans)
+
+
 # ------------------------------------------------------------------ balance
 
 def fill_balance(db: Session, daily_actuals: list[dict]) -> int:

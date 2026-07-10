@@ -135,5 +135,8 @@
   "dash.rain_delay_cancel": "遅延を取消",
   "dash.override_prompt": "新しい時間（分）：",
   "dash.reset_reservoir": "貯水を満杯にする（例：手動散水後）",
-  "dash.reset_confirm": "土壌の貯水を満杯として記録します"
+  "dash.reset_confirm": "土壌の貯水を満杯として記録します",
+  "dash.today": "今日",
+  "dash.tomorrow": "明日",
+  "dash.planned_runs": "件の予定運転"
 }
