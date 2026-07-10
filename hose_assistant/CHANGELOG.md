@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.2.3
+- Fix: the 1.2.2 timezone fix (shell-level `bashio::info.timezone`) wasn't
+  enough — clocks were still 2h behind for some installs. Added a second,
+  more reliable correction done directly by the app at startup: it asks
+  Home Assistant's Core API for the real timezone (the same proven API path
+  already used for weather-entity reads) and applies it to the process
+  clock immediately, before the scheduler is created — self-healing even if
+  the shell-level export silently failed.
+- The exact timezone used (and its source) is now logged as the first event
+  on every startup — check the Dashboard event log after updating to
+  confirm it reads the correct zone, e.g. "Startup timezone: Europe/Rome —
+  ... (source: HA Core API)".
+- As before: press "Recalculate plan" once after updating so any
+  already-planned run gets rebuilt with the correct time.
+
 ## 1.2.2
 - Fix: the container defaulted to UTC, so every internal clock (scheduling,
   daily calc time, watering windows, event log timestamps) was off by your

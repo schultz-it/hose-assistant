@@ -6,6 +6,7 @@ The Supervisor proxy needs no user-provided token: ``SUPERVISOR_TOKEN`` is
 injected by HA because the add-on declares ``homeassistant_api: true``.
 """
 import os
+import time
 
 import httpx
 
@@ -76,6 +77,35 @@ async def get_weather_daily_rain(entity_id: str) -> list[dict]:
         if day:
             out.append({"date": day, "rain_mm": float(f.get("precipitation") or 0.0)})
     return out
+
+
+async def get_ha_timezone() -> str | None:
+    """HA Core's configured time_zone (e.g. "Europe/Rome"), or None.
+
+    Uses ``GET /api/config`` — a standard, always-available Core endpoint —
+    rather than relying on the shell TZ export at container boot, which may
+    silently fail (wrong bashio call, permission quirk, empty result).
+    """
+    async with httpx.AsyncClient(timeout=TIMEOUT) as client:
+        resp = await client.get(f"{SUPERVISOR}/config", headers=_headers())
+    resp.raise_for_status()
+    return resp.json().get("time_zone")
+
+
+async def sync_process_timezone() -> str | None:
+    """Best-effort: make the process clock match HA's real timezone.
+
+    Never raises — if unreachable (e.g. no SUPERVISOR_TOKEN in local dev),
+    the caller falls back to whatever TZ the container already has.
+    """
+    try:
+        tz = await get_ha_timezone()
+    except Exception:  # noqa: BLE001
+        return None
+    if tz and tz != os.environ.get("TZ"):
+        os.environ["TZ"] = tz
+        time.tzset()  # re-read TZ so datetime.now() reflects it immediately
+    return tz
 
 
 def turn_off_sync(entity_id: str) -> None:

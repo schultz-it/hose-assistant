@@ -18,6 +18,7 @@ from fastapi.staticfiles import StaticFiles
 from . import models  # noqa: F401  (import registers the ORM models on Base)
 from .api import backup, config, programs, runs, weather, zones
 from .core import engine as eng
+from .core import ha as ha_client
 from .core import scheduler as sched
 from .core.executor import executor
 from .db import Base, SessionLocal, apply_migrations, engine
@@ -31,16 +32,29 @@ async def lifespan(app: FastAPI):
     """Startup: tables, singleton config, scheduler, close-all clean slate."""
     Base.metadata.create_all(bind=engine)
     apply_migrations()
+    # Correct the process clock BEFORE the scheduler is created (its cron
+    # jobs resolve "local time" at creation time). The run script already
+    # sets TZ from bashio at container boot; this self-heals if that
+    # silently failed, by asking HA Core directly for its real timezone —
+    # the same Supervisor API path already proven to work elsewhere in the
+    # app (weather entity reads, HA state queries).
+    resolved_tz = await ha_client.sync_process_timezone()
     with SessionLocal() as db:
         cfg = db.get(models.SystemConfig, 1)
         if cfg is None:
             cfg = models.SystemConfig(id=1)
             db.add(cfg)
-        # Sync from the container's TZ (set by the run script from HA's own
-        # timezone) — there's no Setup field to override it, so always keep
-        # it accurate rather than only setting it once.
-        if os.environ.get("TZ"):
-            cfg.timezone = os.environ["TZ"]
+        tz = resolved_tz or os.environ.get("TZ")
+        if tz:
+            cfg.timezone = tz
+        # Logged every boot so a wrong clock is diagnosable from the event
+        # log alone, instead of only from user-reported symptoms.
+        import datetime as _dt
+        eng.log_event(
+            db, "info",
+            f"Startup timezone: {tz or 'unresolved (defaulting to container clock)'} "
+            f"— process local time now reads {_dt.datetime.now().isoformat(timespec='seconds')} "
+            f"(source: {'HA Core API' if resolved_tz else 'container TZ env var' if tz else 'none'})")
         # Runs left 'running' by a previous (killed) session must not linger.
         eng.reconcile_interrupted_runs(db)
         db.commit()
