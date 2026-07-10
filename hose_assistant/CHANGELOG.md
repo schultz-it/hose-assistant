@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.2.1
+- Fix: recalculating the plan (manually, automatically after a save, or at
+  the nightly run) could start a run immediately if the program's watering
+  window for today had already passed — e.g. marking a zone "empty" in the
+  evening and hitting Recalculate would fire the valve right away instead
+  of waiting for tomorrow's window. Planning now always rolls forward to
+  the window's next occurrence when today's has closed, for both budget-mode
+  windows and fixed-mode run times; a run is never scheduled outside its
+  configured window.
+
 ## 1.2.0
 - Auto-recalculate the plan after saving: creating/editing/deleting a zone,
   or applying a program set, now triggers the same weather -> deficit ->

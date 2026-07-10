@@ -215,18 +215,26 @@ def cycle_soak(zone: models.Zone, minutes: float) -> list[tuple[float, float]]:
 
 def plan_today(db: Session, cfg: models.SystemConfig, forecast: list[dict],
                today: date | None = None) -> list[models.Schedule]:
-    """Build today's planned runs (engine steps 3-7). Returns created rows.
+    """Build the next planned runs (engine steps 3-7). Returns created rows.
+
+    The irrigation window is always honored: if it is called after today's
+    window (or every fixed-mode run time) has already passed, planning
+    rolls forward to the window's next occurrence (normally tomorrow)
+    instead of ever starting a run "right now" outside the window — this
+    matters because recalculation can be triggered any time of day (manual
+    button, or automatically after saving a zone/program).
 
     ``forecast`` is the fetch_daily() output (needs today + tomorrow rows for
     the 24h rain-skip check and wind).
     """
     today = today or date.today()
+    now = datetime.now()
     created: list[models.Schedule] = []
 
     if not cfg.system_enabled:
         log_event(db, "info", "Plan skipped: system is OFF")
         return created
-    if cfg.rain_delay_until and cfg.rain_delay_until > datetime.now():
+    if cfg.rain_delay_until and cfg.rain_delay_until > now:
         log_event(db, "info", f"Plan skipped: rain delay until {cfg.rain_delay_until}")
         return created
 
@@ -238,25 +246,40 @@ def plan_today(db: Session, cfg: models.SystemConfig, forecast: list[dict],
         log_event(db, "info", f"'{program.name}': today not in allowed days")
         return created
 
-    # Forecast rain in the next 24h (today's remaining + tomorrow forecast rows).
-    next24 = [d for d in forecast if d["date"] >= today.isoformat()][:2]
-    rain_24h = sum(d["rain_mm"] or 0.0 for d in next24)
-    wind_max = max((d.get("wind_kmh") or 0.0 for d in next24), default=0.0)
-    if rain_24h >= cfg.forecast_rain_skip_mm:
-        log_event(db, "info",
-                  f"All runs skipped: {rain_24h:.1f} mm rain forecast in 24h "
-                  f"(threshold {cfg.forecast_rain_skip_mm})")
-        return created
-
-    zones = db.scalars(
-        select(models.Zone).where(models.Zone.enabled).order_by(models.Zone.order, models.Zone.id)
-    ).all()
-    overrides = program.zone_overrides or {}
-
     if program.mode == "fixed":
-        for run in (program.fixed_runs or []):
+        fixed_runs = [
+            r for r in (program.fixed_runs or [])
+            if datetime.combine(today, time.fromisoformat(r["time"])) >= now
+        ]
+        plan_date = today
+        if not fixed_runs and program.fixed_runs:
+            # Every run time for today already passed: roll to tomorrow.
+            plan_date = today + timedelta(days=1)
+            next_program = active_program(db, plan_date)
+            if next_program is None or not _day_allowed(db, next_program, plan_date):
+                log_event(db, "info",
+                          f"'{program.name}': today's run times already passed; "
+                          f"no active program/allowed day tomorrow")
+                return created
+            program = next_program
+            fixed_runs = program.fixed_runs or []
+
+        next24 = [d for d in forecast if d["date"] >= plan_date.isoformat()][:2]
+        rain_24h = sum(d["rain_mm"] or 0.0 for d in next24)
+        if rain_24h >= cfg.forecast_rain_skip_mm:
+            log_event(db, "info",
+                      f"All runs skipped: {rain_24h:.1f} mm rain forecast in 24h "
+                      f"(threshold {cfg.forecast_rain_skip_mm})")
+            return created
+
+        zones = db.scalars(
+            select(models.Zone).where(models.Zone.enabled)
+            .order_by(models.Zone.order, models.Zone.id)
+        ).all()
+        overrides = program.zone_overrides or {}
+        for run in fixed_runs:
             t = time.fromisoformat(run["time"])
-            start = datetime.combine(today, t)
+            start = datetime.combine(plan_date, t)
             for zone in zones:
                 ov = overrides.get(str(zone.id), {})
                 if not ov.get("enabled", True):
@@ -274,6 +297,39 @@ def plan_today(db: Session, cfg: models.SystemConfig, forecast: list[dict],
     window_end = datetime.combine(today, time.fromisoformat(program.window_end))
     if window_end <= window_start:
         window_end += timedelta(days=1)  # window crosses midnight
+
+    if now >= window_end:
+        # Today's window is already closed: roll to its next occurrence
+        # instead of ever starting a run outside the configured window.
+        next_date = today + timedelta(days=1)
+        next_program = active_program(db, next_date)
+        if next_program is None or not _day_allowed(db, next_program, next_date):
+            log_event(db, "info",
+                      f"'{program.name}': today's window already passed; "
+                      f"no active program/allowed day tomorrow")
+            return created
+        program = next_program
+        today = next_date
+        window_start = datetime.combine(today, time.fromisoformat(program.window_start))
+        window_end = datetime.combine(today, time.fromisoformat(program.window_end))
+        if window_end <= window_start:
+            window_end += timedelta(days=1)
+
+    # Forecast rain in the next 24h from the planning day (today's remaining
+    # + tomorrow forecast rows, or the rolled-forward day if we shifted).
+    next24 = [d for d in forecast if d["date"] >= today.isoformat()][:2]
+    rain_24h = sum(d["rain_mm"] or 0.0 for d in next24)
+    wind_max = max((d.get("wind_kmh") or 0.0 for d in next24), default=0.0)
+    if rain_24h >= cfg.forecast_rain_skip_mm:
+        log_event(db, "info",
+                  f"All runs skipped: {rain_24h:.1f} mm rain forecast in 24h "
+                  f"(threshold {cfg.forecast_rain_skip_mm})")
+        return created
+
+    zones = db.scalars(
+        select(models.Zone).where(models.Zone.enabled).order_by(models.Zone.order, models.Zone.id)
+    ).all()
+    overrides = program.zone_overrides or {}
 
     wanted: list[tuple[models.Zone, float]] = []
     for zone in zones:
