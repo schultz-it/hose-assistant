@@ -142,26 +142,31 @@ async def run_program(program_id: int, db: Session = Depends(get_db)) -> dict:
 
 
 @router.post("/zones/{zone_id}/reset_reservoir")
-def reset_reservoir(zone_id: int, db: Session = Depends(get_db)) -> dict:
-    """Mark a zone's soil reservoir as FULL (deficit -> 0).
+def reset_reservoir(zone_id: int,
+                    state: str = Query("full", pattern="^(full|empty)$"),
+                    db: Session = Depends(get_db)) -> dict:
+    """Set a zone's soil reservoir to FULL (deficit 0) or EMPTY (deficit TAW).
 
-    Recorded as manual irrigation equal to the current deficit, so the
-    balance chain stays consistent across recomputes (a raw zero would be
-    overwritten by the next daily calculation).
+    Recorded as a manual adjustment on today's balance row (positive mm for
+    "just watered", negative for "actually bone dry"), so the balance chain
+    stays consistent across recomputes — a raw overwrite would be undone by
+    the next daily calculation.
     """
     zone = db.get(models.Zone, zone_id)
     if zone is None:
         raise HTTPException(status_code=404, detail="Zone not found")
     cfg = ensure_config(db)
-    deficit = eng.current_deficit(db, zone_id)
-    if deficit > 0:
-        eng.record_irrigation(db, zone_id, deficit)
+    target = 0.0 if state == "full" else soil.taw_mm(zone)
+    delta = round(eng.current_deficit(db, zone_id) - target, 3)
+    if abs(delta) > 1e-9:
+        eng.record_irrigation(db, zone_id, delta)
         eng.update_deficits(db, cfg)
     eng.log_event(db, "info",
-                  f"Reservoir reset for '{zone.name}' "
-                  f"({deficit:.1f} mm recorded as manual irrigation)")
+                  f"Reservoir set {state} for '{zone.name}' "
+                  f"({delta:+.1f} mm manual adjustment)")
     db.commit()
-    return {"zone_id": zone_id, "deficit_mm": eng.current_deficit(db, zone_id)}
+    return {"zone_id": zone_id, "state": state,
+            "deficit_mm": eng.current_deficit(db, zone_id)}
 
 
 @router.post("/stop_all")

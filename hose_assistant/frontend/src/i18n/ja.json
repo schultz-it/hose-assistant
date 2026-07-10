@@ -138,5 +138,7 @@
   "dash.reset_confirm": "土壌の貯水を満杯として記録します",
   "dash.today": "今日",
   "dash.tomorrow": "明日",
-  "dash.planned_runs": "件の予定運転"
+  "dash.planned_runs": "件の予定運転",
+  "dash.reset_empty": "貯水を空にする（次回計画で必ず灌水します）",
+  "dash.reset_empty_confirm": "土壌の貯水を空として記録しますか？次回計画でこのゾーンに灌水します"
 }

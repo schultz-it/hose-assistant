@@ -138,5 +138,7 @@
   "dash.reset_confirm": "Den Bodenspeicher als voll markieren",
   "dash.today": "Heute",
   "dash.tomorrow": "Morgen",
-  "dash.planned_runs": "geplante Läufe"
+  "dash.planned_runs": "geplante Läufe",
+  "dash.reset_empty": "Speicher als leer markieren (erzwingt Bewässerung beim nächsten Plan)",
+  "dash.reset_empty_confirm": "Den Bodenspeicher als LEER markieren? Die Zone wird beim nächsten Plan bewässert"
 }

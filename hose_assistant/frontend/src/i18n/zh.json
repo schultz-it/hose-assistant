@@ -138,5 +138,7 @@
   "dash.reset_confirm": "将土壤储水标记为满",
   "dash.today": "今天",
   "dash.tomorrow": "明天",
-  "dash.planned_runs": "个已计划运行"
+  "dash.planned_runs": "个已计划运行",
+  "dash.reset_empty": "将储水标记为空（下次计划时强制浇水）",
+  "dash.reset_empty_confirm": "将土壤储水标记为空？该分区将在下次计划时浇水"
 }

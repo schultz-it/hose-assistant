@@ -138,5 +138,7 @@
   "dash.reset_confirm": "Marcar a reserva do solo como cheia",
   "dash.today": "Hoje",
   "dash.tomorrow": "Amanhã",
-  "dash.planned_runs": "regas planeadas"
+  "dash.planned_runs": "regas planeadas",
+  "dash.reset_empty": "Marcar reserva como vazia (força a rega no próximo plano)",
+  "dash.reset_empty_confirm": "Marcar a reserva do solo como VAZIA? A zona será regada no próximo plano"
 }

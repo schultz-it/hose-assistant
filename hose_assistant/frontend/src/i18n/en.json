@@ -138,5 +138,7 @@
   "dash.reset_confirm": "Mark the soil reservoir as full",
   "dash.today": "Today",
   "dash.tomorrow": "Tomorrow",
-  "dash.planned_runs": "runs planned"
+  "dash.planned_runs": "runs planned",
+  "dash.reset_empty": "Mark reservoir as empty (forces watering at the next plan)",
+  "dash.reset_empty_confirm": "Mark the soil reservoir as EMPTY? The zone will be watered at the next plan"
 }

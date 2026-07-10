@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.3
+- Reservoir reset now goes both ways: two small buttons per zone — 100%
+  (just watered / rain the model missed) and 0% (bone dry: forces watering
+  at the next plan). Both survive recomputes. API:
+  POST /api/zones/{id}/reset_reservoir?state=full|empty.
+
 ## 1.1.2
 - Fix: runs left "running" by an add-on restart or stop no longer linger as
   ghost entries in the dashboard (they showed as duplicate/stale upcoming

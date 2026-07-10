@@ -138,5 +138,7 @@
   "dash.reset_confirm": "Sègna l'aqua in de la tèra come pièna",
   "dash.today": "Incö",
   "dash.tomorrow": "Doman",
-  "dash.planned_runs": "gir in program"
+  "dash.planned_runs": "gir in program",
+  "dash.reset_empty": "Sègna la riserva vöja (la fa bagnà al pròssim pian)",
+  "dash.reset_empty_confirm": "Sègna l'aqua in de la tèra come VÖJA? La zòna la vegnarà bagnada al pròssim pian"
 }

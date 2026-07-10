@@ -111,13 +111,21 @@ export function Dashboard() {
                 <span>{z.name}</span>
                 <span class={`flex items-center gap-2 ${dry ? "text-amber-500" : "text-gray-500"}`}>
                   💧 {left.toFixed(1)}/{z.taw_mm} mm{dry ? ` · ${t("dash.dry")}` : ""}
-                  <button class="text-xs text-gray-400 hover:text-sky-500"
+                  <button class="text-[10px] px-1 rounded border border-gray-300 dark:border-gray-700 text-gray-400 hover:text-sky-500 hover:border-sky-500"
                     title={t("dash.reset_reservoir")}
                     onClick={() => {
                       if (confirm(`${t("dash.reset_confirm")} — ${z.name}?`))
-                        act(() => post(`api/zones/${z.id}/reset_reservoir`));
+                        act(() => post(`api/zones/${z.id}/reset_reservoir?state=full`));
                     }}>
-                    ↺
+                    100%
+                  </button>
+                  <button class="text-[10px] px-1 rounded border border-gray-300 dark:border-gray-700 text-gray-400 hover:text-amber-500 hover:border-amber-500"
+                    title={t("dash.reset_empty")}
+                    onClick={() => {
+                      if (confirm(`${t("dash.reset_empty_confirm")} — ${z.name}?`))
+                        act(() => post(`api/zones/${z.id}/reset_reservoir?state=empty`));
+                    }}>
+                    0%
                   </button>
                 </span>
               </div>

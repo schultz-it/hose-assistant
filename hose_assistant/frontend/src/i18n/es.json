@@ -138,5 +138,7 @@
   "dash.reset_confirm": "Marcar la reserva del suelo como llena",
   "dash.today": "Hoy",
   "dash.tomorrow": "Mañana",
-  "dash.planned_runs": "riegos planificados"
+  "dash.planned_runs": "riegos planificados",
+  "dash.reset_empty": "Marcar reserva como vacía (fuerza el riego en el próximo plan)",
+  "dash.reset_empty_confirm": "¿Marcar la reserva del suelo como VACÍA? La zona se regará en el próximo plan"
 }

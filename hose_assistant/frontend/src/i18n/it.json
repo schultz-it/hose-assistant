@@ -138,5 +138,7 @@
   "dash.reset_confirm": "Segnare la riserva del suolo come piena",
   "dash.today": "Oggi",
   "dash.tomorrow": "Domani",
-  "dash.planned_runs": "corse pianificate"
+  "dash.planned_runs": "corse pianificate",
+  "dash.reset_empty": "Segna riserva vuota (forza l'irrigazione al prossimo piano)",
+  "dash.reset_empty_confirm": "Segnare la riserva del suolo come VUOTA? La zona verrà irrigata al prossimo piano"
 }

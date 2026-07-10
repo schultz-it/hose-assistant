@@ -138,5 +138,7 @@
   "dash.reset_confirm": "وضع علامة أن مخزون التربة ممتلئ",
   "dash.today": "اليوم",
   "dash.tomorrow": "غدًا",
-  "dash.planned_runs": "عمليات مجدولة"
+  "dash.planned_runs": "عمليات مجدولة",
+  "dash.reset_empty": "وضع علامة أن المخزون فارغ (يفرض الري في الخطة القادمة)",
+  "dash.reset_empty_confirm": "وضع علامة أن مخزون التربة فارغ؟ ستُروى المنطقة في الخطة القادمة"
 }

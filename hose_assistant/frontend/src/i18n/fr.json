@@ -138,5 +138,7 @@
   "dash.reset_confirm": "Marquer le réservoir du sol comme plein",
   "dash.today": "Aujourd'hui",
   "dash.tomorrow": "Demain",
-  "dash.planned_runs": "arrosages prévus"
+  "dash.planned_runs": "arrosages prévus",
+  "dash.reset_empty": "Marquer le réservoir comme vide (force l'arrosage au prochain plan)",
+  "dash.reset_empty_confirm": "Marquer le réservoir du sol comme VIDE ? La zone sera arrosée au prochain plan"
 }
