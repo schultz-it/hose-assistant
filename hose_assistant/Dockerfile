@@ -1,7 +1,9 @@
 ARG BUILD_FROM
 FROM $BUILD_FROM
 
-RUN apk add --no-cache python3 py3-pip
+# tzdata: resolves named zones (e.g. Europe/Rome) for both the container's
+# TZ env var (see rootfs run script) and Python's zoneinfo (core/sun.py).
+RUN apk add --no-cache python3 py3-pip tzdata
 
 WORKDIR /app
 COPY backend/requirements.txt .

@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.2.2
+- Fix: the container defaulted to UTC, so every internal clock (scheduling,
+  daily calc time, watering windows, event log timestamps) was off by your
+  UTC offset — 2 hours behind for Central European Summer Time. The
+  container now starts with Home Assistant's own timezone (`TZ`, read via
+  bashio at boot), and Setup's "Timezone" field reflects the real value
+  instead of always showing "auto". `tzdata` added to the image so named
+  zones resolve reliably.
+  - After updating, press "Recalculate plan" once so any run already
+    planned under the old (wrong) clock gets rebuilt with the correct time;
+    the nightly 03:00 run will otherwise pick it up automatically.
+
 ## 1.2.1
 - Fix: recalculating the plan (manually, automatically after a save, or at
   the nightly run) could start a run immediately if the program's watering

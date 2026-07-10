@@ -32,8 +32,15 @@ async def lifespan(app: FastAPI):
     Base.metadata.create_all(bind=engine)
     apply_migrations()
     with SessionLocal() as db:
-        if db.get(models.SystemConfig, 1) is None:
-            db.add(models.SystemConfig(id=1))
+        cfg = db.get(models.SystemConfig, 1)
+        if cfg is None:
+            cfg = models.SystemConfig(id=1)
+            db.add(cfg)
+        # Sync from the container's TZ (set by the run script from HA's own
+        # timezone) — there's no Setup field to override it, so always keep
+        # it accurate rather than only setting it once.
+        if os.environ.get("TZ"):
+            cfg.timezone = os.environ["TZ"]
         # Runs left 'running' by a previous (killed) session must not linger.
         eng.reconcile_interrupted_runs(db)
         db.commit()
