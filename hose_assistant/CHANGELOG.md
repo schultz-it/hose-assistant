@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.3.2
+- New Setup option: **Local rain sensor** — point it at your own station's
+  daily-rain sensor (e.g. an Ecowitt/Netatmo "rain today" entity) and
+  today's fallen rain in the soil reservoir comes from your garden instead
+  of Open-Meteo's regional estimate. Automatic fallback to Open-Meteo (with
+  a logged warning) whenever the sensor is unreadable; inches are converted
+  to mm automatically. A Test button shows exactly what the engine reads.
+
 ## 1.3.1
 - Fix: rain that fell TODAY did not show in the soil reservoir (the info
   panel said "rain 0 mm" right after a rainstorm). The water balance only

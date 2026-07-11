@@ -186,5 +186,7 @@
   "weather.cond.snowy": "雪",
   "weather.cond.snowy_rainy": "みぞれ",
   "weather.cond.sunny": "晴れ",
-  "weather.cond.windy": "強風"
+  "weather.cond.windy": "強風",
+  "setup.rain_today_entity": "ローカル雨量センサー(任意 — 本日の降雨mm)",
+  "setup.rain_today_hint": "自分の気象ステーションの日降雨量センサー(例: Ecowitt/Netatmoの\"rain today\")。設定すると、本日の降雨量はOpen-Meteoの広域推定ではなくここから読み取られます。"
 }

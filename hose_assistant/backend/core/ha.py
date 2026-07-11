@@ -56,6 +56,26 @@ async def turn_off(entity_id: str) -> None:
     await call_on_off(entity_id, False)
 
 
+async def get_rain_today_mm(entity_id: str) -> float | None:
+    """Read a daily-rain sensor (mm fallen today) from a local station.
+
+    Returns None when the entity is missing/unknown/unavailable or not
+    numeric. Inches are converted to mm via the unit_of_measurement
+    attribute; anything else is assumed to already be mm.
+    """
+    state = await get_state(entity_id)
+    if state is None or state.get("state") in (None, "unknown", "unavailable"):
+        return None
+    try:
+        value = float(state["state"])
+    except (TypeError, ValueError):
+        return None
+    unit = (state.get("attributes", {}).get("unit_of_measurement") or "").lower()
+    if unit in ("in", "inch", "inches", "in/d"):
+        value *= 25.4
+    return round(value, 2)
+
+
 async def get_weather_daily_rain(entity_id: str) -> list[dict]:
     """Daily precipitation forecast from an HA ``weather.*`` entity.
 

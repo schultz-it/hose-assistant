@@ -185,6 +185,28 @@ async def weather_now(db: Session = Depends(get_db)) -> dict:
     }
 
 
+@router.get("/weather/rain_sensor_test")
+async def rain_sensor_test(db: Session = Depends(get_db)) -> dict:
+    """Read the configured daily-rain sensor and show what the engine gets."""
+    cfg = ensure_config(db)
+    if not cfg.rain_today_entity:
+        raise HTTPException(status_code=400, detail="No rain sensor configured")
+    try:
+        value = await ha_client.get_rain_today_mm(cfg.rain_today_entity)
+    except Exception as exc:  # noqa: BLE001
+        raise HTTPException(status_code=502,
+                            detail=f"Could not read {cfg.rain_today_entity}: {exc!r}")
+    if value is None:
+        raise HTTPException(status_code=404,
+                            detail=f"{cfg.rain_today_entity} is unavailable or not numeric")
+    return {
+        "entity": cfg.rain_today_entity,
+        "rain_today_mm": value,
+        "note": "This value replaces Open-Meteo's estimate of rain fallen "
+                "today in the soil reservoir.",
+    }
+
+
 @router.get("/balance")
 def get_balance(days: int = 14, db: Session = Depends(get_db)) -> list[dict]:
     rows = db.scalars(

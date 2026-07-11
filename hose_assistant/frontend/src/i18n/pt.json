@@ -186,5 +186,7 @@
   "weather.cond.snowy": "Neve",
   "weather.cond.snowy_rainy": "Aguaneve",
   "weather.cond.sunny": "Soalheiro",
-  "weather.cond.windy": "Ventoso"
+  "weather.cond.windy": "Ventoso",
+  "setup.rain_today_entity": "Sensor de chuva local (opcional — mm caídos hoje)",
+  "setup.rain_today_hint": "Um sensor de chuva diária da sua própria estação (ex. \"rain today\" Ecowitt/Netatmo). Se definido, a chuva caída hoje vem daqui em vez da estimativa regional do Open-Meteo."
 }

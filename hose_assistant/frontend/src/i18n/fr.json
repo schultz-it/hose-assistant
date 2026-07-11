@@ -186,5 +186,7 @@
   "weather.cond.snowy": "Neige",
   "weather.cond.snowy_rainy": "Neige fondue",
   "weather.cond.sunny": "Ensoleillé",
-  "weather.cond.windy": "Venteux"
+  "weather.cond.windy": "Venteux",
+  "setup.rain_today_entity": "Capteur de pluie local (facultatif — mm tombés aujourd'hui)",
+  "setup.rain_today_hint": "Un capteur de pluie journalière de votre propre station (ex. \"rain today\" Ecowitt/Netatmo). S'il est défini, la pluie tombée aujourd'hui provient d'ici au lieu de l'estimation régionale d'Open-Meteo."
 }

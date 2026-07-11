@@ -26,6 +26,8 @@
   "setup.rain_skip": "Skip if rain forecast ≥ (mm/24h)",
   "setup.wind_skip": "Skip spray zones if wind ≥ (km/h, empty = off)",
   "setup.weather_entity": "HA weather entity (optional — overrides forecast rain)",
+  "setup.rain_today_entity": "Local rain sensor (optional — mm fallen today)",
+  "setup.rain_today_hint": "A daily-rain sensor from your own station (e.g. Ecowitt/Netatmo \"rain today\"). When set, today's fallen rain comes from here instead of Open-Meteo's regional estimate.",
   "setup.weather_test": "Test",
   "setup.language": "Language",
   "setup.backup": "Backup & restore",

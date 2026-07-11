@@ -186,5 +186,7 @@
   "weather.cond.snowy": "Nieve",
   "weather.cond.snowy_rainy": "Aguanieve",
   "weather.cond.sunny": "Soleado",
-  "weather.cond.windy": "Ventoso"
+  "weather.cond.windy": "Ventoso",
+  "setup.rain_today_entity": "Sensor de lluvia local (opcional — mm caídos hoy)",
+  "setup.rain_today_hint": "Un sensor de lluvia diaria de tu propia estación (p. ej. \"rain today\" de Ecowitt/Netatmo). Si se configura, la lluvia caída hoy se lee de aquí en lugar de la estimación regional de Open-Meteo."
 }

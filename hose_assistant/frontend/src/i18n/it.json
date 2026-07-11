@@ -186,5 +186,7 @@
   "weather.cond.snowy": "Neve",
   "weather.cond.snowy_rainy": "Nevischio",
   "weather.cond.sunny": "Soleggiato",
-  "weather.cond.windy": "Ventoso"
+  "weather.cond.windy": "Ventoso",
+  "setup.rain_today_entity": "Sensore pioggia locale (opzionale — mm caduti oggi)",
+  "setup.rain_today_hint": "Un sensore di pioggia giornaliera della tua stazione (es. \"rain today\" di Ecowitt/Netatmo). Se impostato, la pioggia caduta oggi viene letta da qui invece che dalla stima regionale di Open-Meteo."
 }

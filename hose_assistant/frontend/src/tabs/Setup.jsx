@@ -71,6 +71,7 @@ export function Setup() {
         forecast_rain_skip_mm: parseFloat(cfg.forecast_rain_skip_mm || 5),
         wind_skip_kmh: cfg.wind_skip_kmh != null ? parseFloat(cfg.wind_skip_kmh) : null,
         weather_entity: cfg.weather_entity,
+        rain_today_entity: cfg.rain_today_entity,
         expose_entities: !!cfg.expose_entities,
       });
       setCfg(updated);
@@ -158,6 +159,25 @@ export function Setup() {
               {t("setup.weather_test")}
             </button>
           </div>
+        </Field>
+        <Field label={t("setup.rain_today_entity")}>
+          <div class="flex gap-2">
+            <input class={inputCls} value={cfg.rain_today_entity ?? ""}
+              onInput={set("rain_today_entity")} placeholder="sensor.station_rain_today" />
+            <button class="rounded-lg bg-gray-200 dark:bg-gray-700 px-3 text-sm shrink-0"
+              onClick={async () => {
+                setMsg("…");
+                try {
+                  const r = await get("api/weather/rain_sensor_test");
+                  setMsg(`✓ ${r.entity} — ${r.rain_today_mm} mm`);
+                } catch (e) {
+                  setMsg(`✗ ${e.message}`);
+                }
+              }}>
+              {t("setup.weather_test")}
+            </button>
+          </div>
+          <p class="text-xs text-gray-400 mt-1">{t("setup.rain_today_hint")}</p>
         </Field>
         <label class="flex items-center gap-2 mb-3 text-sm">
           <input type="checkbox" checked={cfg.expose_entities}

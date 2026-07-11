@@ -24,6 +24,10 @@ class SystemConfig(Base):
     timezone: Mapped[str | None] = mapped_column(String, nullable=True)
     units: Mapped[str] = mapped_column(String, default="metric")
     weather_entity: Mapped[str | None] = mapped_column(String, nullable=True)
+    # Local station's daily-rain sensor (mm fallen today, e.g. an Ecowitt /
+    # Netatmo "rain today" sensor). Preferred over Open-Meteo hourly data
+    # for TODAY's balance row when set and readable.
+    rain_today_entity: Mapped[str | None] = mapped_column(String, nullable=True)
     master_valve_entity: Mapped[str | None] = mapped_column(String, nullable=True)
     master_valve_pre_open_s: Mapped[int] = mapped_column(Integer, default=5)
     daily_calc_time: Mapped[str] = mapped_column(String, default="03:00")

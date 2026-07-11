@@ -186,5 +186,7 @@
   "weather.cond.snowy": "ثلج",
   "weather.cond.snowy_rainy": "مطر وثلج",
   "weather.cond.sunny": "مشمس",
-  "weather.cond.windy": "عاصف"
+  "weather.cond.windy": "عاصف",
+  "setup.rain_today_entity": "مستشعر مطر محلي (اختياري — ملم هطلت اليوم)",
+  "setup.rain_today_hint": "مستشعر المطر اليومي من محطتك الخاصة (مثل \"rain today\" في Ecowitt/Netatmo). عند تعيينه، تُقرأ أمطار اليوم من هنا بدلًا من تقدير Open-Meteo الإقليمي."
 }

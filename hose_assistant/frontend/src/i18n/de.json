@@ -186,5 +186,7 @@
   "weather.cond.snowy": "Schnee",
   "weather.cond.snowy_rainy": "Schneeregen",
   "weather.cond.sunny": "Sonnig",
-  "weather.cond.windy": "Windig"
+  "weather.cond.windy": "Windig",
+  "setup.rain_today_entity": "Lokaler Regensensor (optional — mm heute gefallen)",
+  "setup.rain_today_hint": "Ein Tagesregen-Sensor deiner eigenen Station (z. B. Ecowitt/Netatmo \"rain today\"). Wenn gesetzt, stammt der heute gefallene Regen von hier statt aus der regionalen Open-Meteo-Schätzung."
 }

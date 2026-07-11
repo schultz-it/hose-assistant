@@ -36,6 +36,7 @@ class ConfigRead(BaseModel):
     timezone: Optional[str] = None
     units: Units = "metric"
     weather_entity: Optional[str] = None
+    rain_today_entity: Optional[str] = None
     master_valve_entity: Optional[str] = None
     master_valve_pre_open_s: int = 5
     daily_calc_time: str = "03:00"
@@ -57,6 +58,7 @@ class ConfigUpdate(BaseModel):
     timezone: Optional[str] = None
     units: Optional[Units] = None
     weather_entity: Optional[str] = None
+    rain_today_entity: Optional[str] = None
     master_valve_entity: Optional[str] = None
     master_valve_pre_open_s: Optional[int] = Field(default=None, ge=0)
     daily_calc_time: Optional[str] = None

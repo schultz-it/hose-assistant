@@ -106,17 +106,32 @@ async def run_recalc(db: Session, cfg: models.SystemConfig) -> list[models.Sched
                           f"({exc!r}); using Open-Meteo forecast")
     balance_days = [d for d in daily if d["date"] < today_iso]
     # Today gets a PARTIAL row — rain actually fallen and ET0 accumulated so
-    # far (hourly sums) — so the reservoir reflects rain as it happens.
-    # Recomputed on every recalc; tomorrow the full-day actual replaces it.
-    # Best-effort: without it the balance is simply as of yesterday (the
-    # pre-1.3.1 behaviour), which planning already tolerates.
+    # far — so the reservoir reflects rain as it happens. Recomputed on every
+    # recalc; tomorrow the full-day actual replaces it. Best-effort: without
+    # it the balance is simply as of yesterday (the pre-1.3.1 behaviour),
+    # which planning already tolerates.
     try:
         so_far = await weather.fetch_today_so_far(cfg.latitude, cfg.longitude)
-        balance_days.append({"date": today_iso, **so_far})
     except Exception as exc:  # noqa: BLE001
+        so_far = None
         eng.log_event(db, "warning",
                       f"Today's partial rain/ET0 unavailable ({exc}); "
                       f"balance is as of yesterday")
+    if so_far is not None:
+        # A local station's daily-rain sensor, when configured and readable,
+        # beats Open-Meteo's regional hourly estimate for rain fallen today.
+        if cfg.rain_today_entity:
+            try:
+                local_rain = await ha.get_rain_today_mm(cfg.rain_today_entity)
+            except Exception:  # noqa: BLE001
+                local_rain = None
+            if local_rain is not None:
+                so_far["rain_mm"] = local_rain
+            else:
+                eng.log_event(db, "warning",
+                              f"Rain sensor {cfg.rain_today_entity} unreadable; "
+                              f"using Open-Meteo for today's rain")
+        balance_days.append({"date": today_iso, **so_far})
     eng.fill_balance(db, balance_days)
     eng.update_deficits(db, cfg)
     # Drop stale planned rows, then re-plan from scratch.

@@ -186,5 +186,7 @@
   "weather.cond.snowy": "Név",
   "weather.cond.snowy_rainy": "Nevisca",
   "weather.cond.sunny": "Sereno de sô",
-  "weather.cond.windy": "Ventós"
+  "weather.cond.windy": "Ventós",
+  "setup.rain_today_entity": "Sensór de piöva local (se te vöret — mm borlaa gió incö)",
+  "setup.rain_today_hint": "On sensór de piöva del dì de la tòa stazión (es. \"rain today\" de Ecowitt/Netatmo). Se te 'l mètet sü, la piöva borlada gió incö la vegn lecüda de chì invece che de la stima de la zòna de Open-Meteo."
 }

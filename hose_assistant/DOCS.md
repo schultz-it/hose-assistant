@@ -49,6 +49,7 @@ everything; zones run strictly one at a time.
 | Skip if rain forecast ≥ mm/24h | Skips all runs if that much rain is coming. | 5 mm default. Lower it if your soil holds water well. |
 | Skip spray zones if wind ≥ km/h | Wind blows spray away; drip is unaffected. | 20–30 km/h is a sensible threshold. Empty = disabled. |
 | HA weather entity | Overrides the **forecast** rain with your own integration (past actuals stay Open-Meteo). | Press **Test** to see exactly what the engine will read. |
+| Local rain sensor | A daily-rain sensor (mm fallen today) from your own station — overrides Open-Meteo's estimate of **today's fallen rain** in the soil reservoir. | e.g. an Ecowitt/Netatmo "rain today" sensor. Falls back to Open-Meteo automatically if unreadable. |
 | Expose entities | Publishes sensors/switch/number back into HA (section 7). | |
 
 ---

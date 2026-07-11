@@ -44,6 +44,7 @@ _MIGRATIONS: list[tuple[str, str, str]] = [
     ("zones", "line_length_m", "FLOAT"),
     ("zones", "cover", "VARCHAR DEFAULT 'none'"),
     ("system_config", "expose_entities", "BOOLEAN DEFAULT 0"),
+    ("system_config", "rain_today_entity", "VARCHAR"),
 ]
 
 

@@ -186,5 +186,7 @@
   "weather.cond.snowy": "雪",
   "weather.cond.snowy_rainy": "雨夹雪",
   "weather.cond.sunny": "晴天",
-  "weather.cond.windy": "大风"
+  "weather.cond.windy": "大风",
+  "setup.rain_today_entity": "本地雨量传感器（可选 — 今日降雨毫米数）",
+  "setup.rain_today_hint": "来自您自己气象站的日降雨量传感器（如 Ecowitt/Netatmo 的\"今日降雨\"）。设置后，今日已降雨量将从此处读取，而非 Open-Meteo 的区域估算。"
 }
