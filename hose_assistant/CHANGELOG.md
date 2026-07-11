@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.5
+- The soil-reservoir level now refreshes on its own every hour, not only
+  after the nightly calc, a manual "Recalculate plan", or saving a zone/
+  program — previously it could sit "stuck" at whatever was last computed
+  for hours even as conditions changed.
+
 ## 1.2.4
 - Fix: event log timestamps were still 2h behind even after 1.2.3's clock
   fix, because they were generated with an explicit `datetime.utcnow()`

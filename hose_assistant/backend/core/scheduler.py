@@ -39,12 +39,24 @@ def init() -> AsyncIOScheduler:
     ex.set_scheduler(scheduler)
     scheduler.start()
     reschedule_daily_calc()
+    # Keep the displayed deficit/reservoir fresh between the nightly calc and
+    # any user action (save, manual recalc) — otherwise it only reflects
+    # whatever was last computed, however many hours ago that was.
+    scheduler.add_job(periodic_recalc, "interval", hours=1,
+                      id="periodic_recalc", replace_existing=True,
+                      misfire_grace_time=1800)
     # SPEC 11: entity exposure tick (no-op unless enabled in Setup).
     from . import expose
 
     scheduler.add_job(expose.refresh_job, "interval", seconds=60,
                       id="expose_refresh", replace_existing=True)
     return scheduler
+
+
+async def periodic_recalc() -> None:
+    """Hourly tick: same best-effort pipeline as after a zone/program save."""
+    with SessionLocal() as db:
+        await try_recalc(db, "periodic refresh")
 
 
 def shutdown() -> None:
