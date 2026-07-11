@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.2.7
+- Fix: after updating the add-on, some phones/browsers kept showing the
+  OLD web UI (e.g. 1.2.6's new button appeared missing) even though the
+  server-side version was correctly updated. Root cause: `index.html` had
+  no explicit cache policy, so once a browser cached it, it kept loading
+  the JS bundle it referenced forever, never noticing newer builds existed.
+  `index.html` is now always served with `Cache-Control: no-cache` (forces
+  a freshness check on every load); the hashed `/assets/*.js` files it
+  references remain safely cacheable long-term since their filename
+  changes on every build.
+  - If your browser is currently stuck on a cached old UI, one hard-refresh
+    (or clear the site's cache) after updating to 1.2.7 clears it for good —
+    this fix prevents it from ever happening again on future updates.
+
 ## 1.2.6
 - Zones tab: a "🔄 Recalculate now" button (same manual recalc as the
   Dashboard, now available where you're actually looking at zones), plus a

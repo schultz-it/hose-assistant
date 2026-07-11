@@ -12,7 +12,7 @@ from pathlib import Path
 
 import httpx
 from fastapi import FastAPI
-from fastapi.responses import HTMLResponse
+from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 
 from . import models  # noqa: F401  (import registers the ORM models on Base)
@@ -203,8 +203,21 @@ async def ha_entities(domain: str = "switch") -> dict:
     return {"domain": domain, "count": len(entities), "entities": entities}
 
 
-# Serve the built SPA (Milestone 5). Mounted last so /api/* and /dev win.
-# html=True serves index.html at "/" and for unknown paths (SPA routing).
+# Serve the built SPA (Milestone 5). Registered last so /api/* and /dev win.
 FRONTEND_DIST = Path(__file__).resolve().parent.parent / "frontend" / "dist"
-if (FRONTEND_DIST / "index.html").exists():
-    app.mount("/", StaticFiles(directory=FRONTEND_DIST, html=True), name="spa")
+INDEX_HTML = FRONTEND_DIST / "index.html"
+
+if INDEX_HTML.exists():
+    # Hashed build assets (filename changes every build) are safe to cache
+    # forever. index.html itself must NEVER be cached: its name never
+    # changes, so a browser/phone that cached it once would keep loading
+    # whatever JS bundle it references forever, even after the add-on
+    # updates server-side (this is exactly what happened going into 1.2.7).
+    app.mount("/assets", StaticFiles(directory=FRONTEND_DIST / "assets"), name="assets")
+
+    @app.get("/{full_path:path}", response_class=HTMLResponse)
+    async def spa(full_path: str) -> FileResponse:
+        return FileResponse(
+            INDEX_HTML,
+            headers={"Cache-Control": "no-cache, no-store, must-revalidate"},
+        )
