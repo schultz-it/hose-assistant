@@ -32,19 +32,42 @@ function dripRate(z) {
 
 export function Zones() {
   const [zones, setZones] = useState(null);
+  const [reservoir, setReservoir] = useState({}); // zone_id -> {deficit_mm, taw_mm}
   const [editing, setEditing] = useState(null); // null | zone-like object
   const [entities, setEntities] = useState([]);
   const [msg, setMsg] = useState("");
+  const [recalcMsg, setRecalcMsg] = useState("");
+  const [recalcBusy, setRecalcBusy] = useState(false);
 
   const load = () => get("api/zones").then(setZones);
+  const loadReservoir = () =>
+    get("api/status").then((st) => {
+      const map = {};
+      for (const z of st.zones) map[z.id] = { deficit_mm: z.deficit_mm, taw_mm: z.taw_mm };
+      setReservoir(map);
+    }).catch(() => {});
   useEffect(() => {
     load();
+    loadReservoir();
     Promise.all([
       get("api/ha/entities?domain=input_boolean").catch(() => ({ entities: [] })),
       get("api/ha/entities?domain=switch").catch(() => ({ entities: [] })),
       get("api/ha/entities?domain=valve").catch(() => ({ entities: [] })),
     ]).then((rs) => setEntities(rs.flatMap((r) => r.entities.map((e) => e.entity_id))));
   }, []);
+
+  async function recalcNow() {
+    setRecalcBusy(true);
+    setRecalcMsg(t("zones.recalculating"));
+    try {
+      const r = await post("api/engine/recalc");
+      setRecalcMsg(`✓ ${r.planned_runs} ${t("dash.planned_runs")}`);
+      loadReservoir();
+    } catch (e) {
+      setRecalcMsg(`✗ ${e.message}`);
+    }
+    setRecalcBusy(false);
+  }
 
   if (!zones) return <p>{t("common.loading")}</p>;
 
@@ -82,6 +105,7 @@ export function Zones() {
       setEditing(null);
       setMsg("");
       load();
+      loadReservoir(); // saving a zone auto-recalculates (SPEC) — reflect it
     } catch (e) {
       setMsg(`✗ ${e.message}`);
     }
@@ -90,6 +114,7 @@ export function Zones() {
   async function remove(id) {
     await del(`api/zones/${id}`);
     load();
+    loadReservoir();
   }
 
   if (editing)
@@ -220,10 +245,19 @@ export function Zones() {
 
   return (
     <div>
+      <div class="flex items-center gap-2 mb-3">
+        <button class={btnGray} disabled={recalcBusy} onClick={recalcNow}>
+          🔄 {t("zones.recalc_now")}
+        </button>
+        <span class="text-sm">{recalcMsg}</span>
+      </div>
       {zones.length === 0 && (
         <Card><p class="text-gray-500">{t("zones.empty")}</p></Card>
       )}
-      {zones.map((z) => (
+      {zones.map((z) => {
+        const r = reservoir[z.id];
+        const left = r ? Math.max(0, r.taw_mm - r.deficit_mm) : null;
+        return (
         <Card key={z.id}>
           <div class="flex items-center justify-between">
             <div>
@@ -235,6 +269,11 @@ export function Zones() {
                 {z.valve_entity} · {t(`zones.type.${z.irrigation_type}`)} ·{" "}
                 {z.precipitation_rate_mmh} mm/h · {t(`zones.soil.${z.soil_type}`)}
               </div>
+              {r && (
+                <div class="text-xs text-sky-600 dark:text-sky-400 mt-1">
+                  💧 {t("zones.deficit_now")}: {left.toFixed(1)}/{r.taw_mm} mm
+                </div>
+              )}
             </div>
             <div class="flex gap-2">
               <button class={btnGray} onClick={() => setEditing({ ...z })}>
@@ -244,7 +283,8 @@ export function Zones() {
             </div>
           </div>
         </Card>
-      ))}
+        );
+      })}
       <button class={btnCls} onClick={() => setEditing({ ...EMPTY, order: zones.length })}>
         + {t("common.add")}
       </button>

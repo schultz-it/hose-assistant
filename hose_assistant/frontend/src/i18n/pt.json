@@ -3,7 +3,6 @@
   "tabs.zones": "Zonas",
   "tabs.programs": "Programas",
   "tabs.dashboard": "Painel",
-
   "common.save": "Guardar",
   "common.cancel": "Cancelar",
   "common.delete": "Eliminar",
@@ -13,7 +12,6 @@
   "common.loading": "A carregar…",
   "common.minutes": "min",
   "common.enabled": "Ativa",
-
   "setup.title": "Configuração do sistema",
   "setup.location": "Localização",
   "setup.latitude": "Latitude",
@@ -36,7 +34,6 @@
   "setup.restore_confirm": "O restauro SUBSTITUI todas as definições e o histórico atuais pela cópia. Continuar?",
   "setup.expose": "Expor entidades ao Home Assistant",
   "setup.expose_hint": "Sensores de défice e próxima rega por zona, zona/programa ativo, mais um interruptor de sistema e um número de intensidade — via MQTT discovery se houver um broker (senão sensores REST só de leitura). Aplica-se num minuto.",
-
   "zones.title": "Zonas",
   "zones.empty": "Ainda sem zonas. Adicione a primeira abaixo.",
   "zones.name": "Nome",
@@ -80,7 +77,8 @@
   "zones.shade_fine": "Ajuste fino de sombra",
   "zones.max_runtime": "Duração máx. (min)",
   "zones.deficit_now": "Défice atual",
-
+  "zones.recalc_now": "Recalcular agora",
+  "zones.recalculating": "A recalcular…",
   "programs.title": "Programas",
   "programs.empty": "Ainda sem programas. Gere-os a partir do seu clima local abaixo.",
   "programs.window": "Janela",
@@ -105,7 +103,6 @@
   "programs.reviewing": "A rever a sua configuração…",
   "programs.proposal": "Programas propostos — reveja e aplique",
   "programs.apply": "Aplicar proposta",
-
   "dash.now": "Agora",
   "dash.idle": "Inativo — sem rega em curso",
   "dash.running": "Rega em curso",

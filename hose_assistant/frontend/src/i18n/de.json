@@ -3,7 +3,6 @@
   "tabs.zones": "Zonen",
   "tabs.programs": "Programme",
   "tabs.dashboard": "Dashboard",
-
   "common.save": "Speichern",
   "common.cancel": "Abbrechen",
   "common.delete": "Löschen",
@@ -13,7 +12,6 @@
   "common.loading": "Wird geladen…",
   "common.minutes": "Min",
   "common.enabled": "Aktiv",
-
   "setup.title": "Systemeinrichtung",
   "setup.location": "Standort",
   "setup.latitude": "Breitengrad",
@@ -36,7 +34,6 @@
   "setup.restore_confirm": "Die Wiederherstellung ERSETZT alle aktuellen Einstellungen und den Verlauf durch die Sicherung. Fortfahren?",
   "setup.expose": "Entitäten an Home Assistant bereitstellen",
   "setup.expose_hint": "Defizit- und Nächster-Lauf-Sensoren pro Zone, aktive Zone/Programm, plus ein System-Schalter und eine Intensitäts-Zahl — via MQTT-Discovery, falls ein Broker verfügbar ist (sonst schreibgeschützte REST-Sensoren). Wirkt innerhalb einer Minute.",
-
   "zones.title": "Zonen",
   "zones.empty": "Noch keine Zonen. Fügen Sie unten Ihre erste Zone hinzu.",
   "zones.name": "Name",
@@ -80,7 +77,8 @@
   "zones.shade_fine": "Feineinstellung Schatten",
   "zones.max_runtime": "Max. Laufzeit (Min)",
   "zones.deficit_now": "Aktuelles Defizit",
-
+  "zones.recalc_now": "Jetzt neu berechnen",
+  "zones.recalculating": "Wird neu berechnet…",
   "programs.title": "Programme",
   "programs.empty": "Noch keine Programme. Generieren Sie sie unten aus Ihrem lokalen Klima.",
   "programs.window": "Fenster",
@@ -105,7 +103,6 @@
   "programs.reviewing": "Ihre Konfiguration wird geprüft…",
   "programs.proposal": "Vorgeschlagene Programme — prüfen, dann anwenden",
   "programs.apply": "Vorschlag anwenden",
-
   "dash.now": "Jetzt",
   "dash.idle": "Inaktiv — keine Bewässerung aktiv",
   "dash.running": "Bewässerung läuft",

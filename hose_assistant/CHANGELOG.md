@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.6
+- Zones tab: a "🔄 Recalculate now" button (same manual recalc as the
+  Dashboard, now available where you're actually looking at zones), plus a
+  live "current deficit / reservoir" reading shown on each zone card so you
+  can see the effect immediately without switching tabs.
+
 ## 1.2.5
 - The soil-reservoir level now refreshes on its own every hour, not only
   after the nightly calc, a manual "Recalculate plan", or saving a zone/

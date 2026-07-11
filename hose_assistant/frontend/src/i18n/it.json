@@ -3,7 +3,6 @@
   "tabs.zones": "Zone",
   "tabs.programs": "Programmi",
   "tabs.dashboard": "Dashboard",
-
   "common.save": "Salva",
   "common.cancel": "Annulla",
   "common.delete": "Elimina",
@@ -13,7 +12,6 @@
   "common.loading": "Caricamento…",
   "common.minutes": "min",
   "common.enabled": "Attiva",
-
   "setup.title": "Configurazione sistema",
   "setup.location": "Posizione",
   "setup.latitude": "Latitudine",
@@ -36,7 +34,6 @@
   "setup.backup_download": "Scarica backup",
   "setup.backup_restore": "Ripristina da file",
   "setup.restore_confirm": "Il ripristino SOSTITUISCE tutte le impostazioni e lo storico attuali con il backup. Continuare?",
-
   "zones.title": "Zone",
   "zones.empty": "Nessuna zona. Aggiungi la prima qui sotto.",
   "zones.name": "Nome",
@@ -80,7 +77,8 @@
   "zones.shade_fine": "Regolazione fine ombra",
   "zones.max_runtime": "Durata massima (min)",
   "zones.deficit_now": "Deficit attuale",
-
+  "zones.recalc_now": "Ricalcola ora",
+  "zones.recalculating": "Ricalcolo in corso…",
   "programs.title": "Programmi",
   "programs.empty": "Nessun programma. Generali dal tuo clima locale qui sotto.",
   "programs.window": "Finestra",
@@ -105,7 +103,6 @@
   "programs.reviewing": "Analisi della configurazione…",
   "programs.proposal": "Programmi proposti — controlla e applica",
   "programs.apply": "Applica proposta",
-
   "dash.now": "Adesso",
   "dash.idle": "Inattivo — nessuna irrigazione in corso",
   "dash.running": "Irrigazione in corso",

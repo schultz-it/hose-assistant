@@ -3,7 +3,6 @@
   "tabs.zones": "ゾーン",
   "tabs.programs": "プログラム",
   "tabs.dashboard": "ダッシュボード",
-
   "common.save": "保存",
   "common.cancel": "キャンセル",
   "common.delete": "削除",
@@ -13,7 +12,6 @@
   "common.loading": "読み込み中…",
   "common.minutes": "分",
   "common.enabled": "有効",
-
   "setup.title": "システム設定",
   "setup.location": "位置",
   "setup.latitude": "緯度",
@@ -36,7 +34,6 @@
   "setup.restore_confirm": "復元すると、現在のすべての設定と履歴がバックアップで置き換えられます。続行しますか？",
   "setup.expose": "エンティティを Home Assistant に公開",
   "setup.expose_hint": "ゾーンごとの不足量と次回運転センサー、稼働中ゾーン/プログラム、さらにシステムスイッチと強度の数値 — ブローカーがあれば MQTT ディスカバリー経由（なければ REST 読み取り専用センサー）。1 分以内に反映されます。",
-
   "zones.title": "ゾーン",
   "zones.empty": "ゾーンがまだありません。下から最初のゾーンを追加してください。",
   "zones.name": "名前",
@@ -80,7 +77,8 @@
   "zones.shade_fine": "日陰の微調整",
   "zones.max_runtime": "最大運転時間 (分)",
   "zones.deficit_now": "現在の不足量",
-
+  "zones.recalc_now": "今すぐ再計算",
+  "zones.recalculating": "再計算中…",
   "programs.title": "プログラム",
   "programs.empty": "プログラムがまだありません。下から地域の気候をもとに生成してください。",
   "programs.window": "時間帯",
@@ -105,7 +103,6 @@
   "programs.reviewing": "設定を確認中…",
   "programs.proposal": "提案されたプログラム — 確認して適用",
   "programs.apply": "提案を適用",
-
   "dash.now": "現在",
   "dash.idle": "待機中 — 灌水なし",
   "dash.running": "灌水中",

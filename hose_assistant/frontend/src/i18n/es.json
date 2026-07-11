@@ -3,7 +3,6 @@
   "tabs.zones": "Zonas",
   "tabs.programs": "Programas",
   "tabs.dashboard": "Panel",
-
   "common.save": "Guardar",
   "common.cancel": "Cancelar",
   "common.delete": "Eliminar",
@@ -13,7 +12,6 @@
   "common.loading": "Cargando…",
   "common.minutes": "min",
   "common.enabled": "Activada",
-
   "setup.title": "Configuración del sistema",
   "setup.location": "Ubicación",
   "setup.latitude": "Latitud",
@@ -36,7 +34,6 @@
   "setup.restore_confirm": "La restauración SUSTITUIRÁ todos los ajustes e historial actuales por la copia. ¿Continuar?",
   "setup.expose": "Exponer entidades a Home Assistant",
   "setup.expose_hint": "Sensores de déficit y próximo riego por zona, zona/programa activo, más un interruptor de sistema y un número de intensidad — vía MQTT discovery si hay un broker (si no, sensores REST de solo lectura). Se aplica en un minuto.",
-
   "zones.title": "Zonas",
   "zones.empty": "Aún no hay zonas. Añade tu primera zona abajo.",
   "zones.name": "Nombre",
@@ -80,7 +77,8 @@
   "zones.shade_fine": "Ajuste fino de sombra",
   "zones.max_runtime": "Duración máx. (min)",
   "zones.deficit_now": "Déficit actual",
-
+  "zones.recalc_now": "Recalcular ahora",
+  "zones.recalculating": "Recalculando…",
   "programs.title": "Programas",
   "programs.empty": "Aún no hay programas. Genéralos desde tu clima local abajo.",
   "programs.window": "Ventana",
@@ -105,7 +103,6 @@
   "programs.reviewing": "Revisando tu configuración…",
   "programs.proposal": "Programas propuestos — revisa y aplica",
   "programs.apply": "Aplicar propuesta",
-
   "dash.now": "Ahora",
   "dash.idle": "Inactivo — sin riego en curso",
   "dash.running": "Riego en curso",

@@ -3,7 +3,6 @@
   "tabs.zones": "Zones",
   "tabs.programs": "Programmes",
   "tabs.dashboard": "Tableau de bord",
-
   "common.save": "Enregistrer",
   "common.cancel": "Annuler",
   "common.delete": "Supprimer",
@@ -13,7 +12,6 @@
   "common.loading": "Chargement…",
   "common.minutes": "min",
   "common.enabled": "Activée",
-
   "setup.title": "Configuration du système",
   "setup.location": "Emplacement",
   "setup.latitude": "Latitude",
@@ -36,7 +34,6 @@
   "setup.restore_confirm": "La restauration REMPLACERA tous les réglages et l'historique actuels par la sauvegarde. Continuer ?",
   "setup.expose": "Exposer les entités à Home Assistant",
   "setup.expose_hint": "Capteurs de déficit et de prochaine irrigation par zone, zone/programme actif, plus un interrupteur système et un nombre d'intensité — via MQTT discovery si un broker est disponible (sinon capteurs REST en lecture seule). Effectif en une minute.",
-
   "zones.title": "Zones",
   "zones.empty": "Aucune zone. Ajoutez votre première zone ci-dessous.",
   "zones.name": "Nom",
@@ -80,7 +77,8 @@
   "zones.shade_fine": "Réglage fin de l'ombre",
   "zones.max_runtime": "Durée max (min)",
   "zones.deficit_now": "Déficit actuel",
-
+  "zones.recalc_now": "Recalculer maintenant",
+  "zones.recalculating": "Recalcul en cours…",
   "programs.title": "Programmes",
   "programs.empty": "Aucun programme. Générez-les depuis votre climat local ci-dessous.",
   "programs.window": "Fenêtre",
@@ -105,7 +103,6 @@
   "programs.reviewing": "Analyse de votre configuration…",
   "programs.proposal": "Programmes proposés — vérifiez, puis appliquez",
   "programs.apply": "Appliquer la proposition",
-
   "dash.now": "Maintenant",
   "dash.idle": "Inactif — aucune irrigation en cours",
   "dash.running": "Irrigation en cours",

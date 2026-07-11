@@ -3,7 +3,6 @@
   "tabs.zones": "Zòn",
   "tabs.programs": "Programm",
   "tabs.dashboard": "Quader",
-
   "common.save": "Salva",
   "common.cancel": "Lassa perd",
   "common.delete": "Scancèla",
@@ -13,7 +12,6 @@
   "common.loading": "El carega…",
   "common.minutes": "min",
   "common.enabled": "Impiada",
-
   "setup.title": "Regolazión del sistéma",
   "setup.location": "Indua te sée",
   "setup.latitude": "Latitüden",
@@ -36,7 +34,6 @@
   "setup.restore_confirm": "El ripristin el CAMBIA tütt i regolazión e la storia de adèss cont la copia. Vòo inanz?",
   "setup.expose": "Fà vedè i entità a Home Assistant",
   "setup.expose_hint": "Sensór de quèl che manca e del pròssim gir per ogni zòna, zòna/program impiada, püssee on interütór del sistéma e on nümer per la fòrza — con MQTT se te ghe on broker (senò sensór REST de sula lecüra). El va dént in d'on minüt.",
-
   "zones.title": "Zòn",
   "zones.empty": "Anmò nissüna zòna. Zónta la prima chì sóta.",
   "zones.name": "Nòm",
@@ -80,7 +77,8 @@
   "zones.shade_fine": "Regola fina de l'ombrìa",
   "zones.max_runtime": "Temp màssim (min)",
   "zones.deficit_now": "Quèl che manca adèss",
-
+  "zones.recalc_now": "Cünta de növ adèss",
+  "zones.recalculating": "El cünta de növ…",
   "programs.title": "Programm",
   "programs.empty": "Anmò nissün program. Fàj sü del clima de chì sóta.",
   "programs.window": "Finèstra",
@@ -105,7 +103,6 @@
   "programs.reviewing": "El varda la tòa regolazión…",
   "programs.proposal": "Programm proponü — cuntrola, pö mèt sü",
   "programs.apply": "Mèt sü la propòsta",
-
   "dash.now": "Adèss",
   "dash.idle": "Fèrma — se bagna nagòtt",
   "dash.running": "Se sta bagnand",

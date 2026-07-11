@@ -3,7 +3,6 @@
   "tabs.zones": "分区",
   "tabs.programs": "程序",
   "tabs.dashboard": "仪表板",
-
   "common.save": "保存",
   "common.cancel": "取消",
   "common.delete": "删除",
@@ -13,7 +12,6 @@
   "common.loading": "加载中…",
   "common.minutes": "分钟",
   "common.enabled": "已启用",
-
   "setup.title": "系统设置",
   "setup.location": "位置",
   "setup.latitude": "纬度",
@@ -36,7 +34,6 @@
   "setup.restore_confirm": "恢复将用备份替换所有当前设置和历史。是否继续？",
   "setup.expose": "向 Home Assistant 公开实体",
   "setup.expose_hint": "每个分区的亏缺和下次运行传感器、活动分区/程序，以及系统开关和强度数值 — 若有代理则通过 MQTT 发现（否则为 REST 只读传感器）。一分钟内生效。",
-
   "zones.title": "分区",
   "zones.empty": "尚无分区。请在下方添加第一个分区。",
   "zones.name": "名称",
@@ -80,7 +77,8 @@
   "zones.shade_fine": "遮荫微调",
   "zones.max_runtime": "最长运行（分钟）",
   "zones.deficit_now": "当前亏缺",
-
+  "zones.recalc_now": "立即重新计算",
+  "zones.recalculating": "正在重新计算…",
   "programs.title": "程序",
   "programs.empty": "尚无程序。请在下方根据本地气候生成。",
   "programs.window": "时段",
@@ -105,7 +103,6 @@
   "programs.reviewing": "正在评估你的配置…",
   "programs.proposal": "建议的程序 — 检查后应用",
   "programs.apply": "应用方案",
-
   "dash.now": "当前",
   "dash.idle": "空闲 — 无灌溉进行",
   "dash.running": "灌溉进行中",

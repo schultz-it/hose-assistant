@@ -3,7 +3,6 @@
   "tabs.zones": "المناطق",
   "tabs.programs": "البرامج",
   "tabs.dashboard": "لوحة التحكم",
-
   "common.save": "حفظ",
   "common.cancel": "إلغاء",
   "common.delete": "حذف",
@@ -13,7 +12,6 @@
   "common.loading": "جارٍ التحميل…",
   "common.minutes": "دقيقة",
   "common.enabled": "مُفعّلة",
-
   "setup.title": "إعداد النظام",
   "setup.location": "الموقع",
   "setup.latitude": "خط العرض",
@@ -36,7 +34,6 @@
   "setup.restore_confirm": "ستؤدي الاستعادة إلى استبدال جميع الإعدادات والسجل الحالي بالنسخة الاحتياطية. هل تريد المتابعة؟",
   "setup.expose": "عرض الكيانات في Home Assistant",
   "setup.expose_hint": "مستشعرات العجز والتشغيل التالي لكل منطقة، المنطقة/البرنامج النشط، بالإضافة إلى مفتاح للنظام ورقم للشدّة — عبر اكتشاف MQTT إن توفّر وسيط (وإلا مستشعرات REST للقراءة فقط). يُطبَّق خلال دقيقة.",
-
   "zones.title": "المناطق",
   "zones.empty": "لا توجد مناطق بعد. أضف منطقتك الأولى أدناه.",
   "zones.name": "الاسم",
@@ -80,7 +77,8 @@
   "zones.shade_fine": "ضبط دقيق للظل",
   "zones.max_runtime": "أقصى مدة تشغيل (دقيقة)",
   "zones.deficit_now": "العجز الحالي",
-
+  "zones.recalc_now": "إعادة الحساب الآن",
+  "zones.recalculating": "جارٍ إعادة الحساب…",
   "programs.title": "البرامج",
   "programs.empty": "لا توجد برامج بعد. أنشئها من مناخك المحلي أدناه.",
   "programs.window": "النافذة",
@@ -105,7 +103,6 @@
   "programs.reviewing": "مراجعة إعداداتك…",
   "programs.proposal": "البرامج المقترحة — راجع ثم طبّق",
   "programs.apply": "تطبيق الاقتراح",
-
   "dash.now": "الآن",
   "dash.idle": "خامل — لا يوجد ري جارٍ",
   "dash.running": "الري جارٍ",

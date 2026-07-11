@@ -3,7 +3,6 @@
   "tabs.zones": "Zones",
   "tabs.programs": "Programs",
   "tabs.dashboard": "Dashboard",
-
   "common.save": "Save",
   "common.cancel": "Cancel",
   "common.delete": "Delete",
@@ -13,7 +12,6 @@
   "common.loading": "Loading…",
   "common.minutes": "min",
   "common.enabled": "Enabled",
-
   "setup.title": "System setup",
   "setup.location": "Location",
   "setup.latitude": "Latitude",
@@ -36,7 +34,6 @@
   "setup.restore_confirm": "Restore will REPLACE all current settings and history with the backup. Continue?",
   "setup.expose": "Expose entities to Home Assistant",
   "setup.expose_hint": "Per-zone deficit & next-run sensors, active zone/program, plus a system switch and intensity number — via MQTT discovery if a broker is available (REST read-only sensors otherwise). Takes effect within a minute.",
-
   "zones.title": "Zones",
   "zones.empty": "No zones yet. Add your first zone below.",
   "zones.name": "Name",
@@ -80,7 +77,8 @@
   "zones.shade_fine": "Fine shade adjust",
   "zones.max_runtime": "Max runtime (min)",
   "zones.deficit_now": "Current deficit",
-
+  "zones.recalc_now": "Recalculate now",
+  "zones.recalculating": "Recalculating…",
   "programs.title": "Programs",
   "programs.empty": "No programs yet. Generate them from your local climate below.",
   "programs.window": "Window",
@@ -105,7 +103,6 @@
   "programs.reviewing": "Reviewing your setup…",
   "programs.proposal": "Proposed programs — review, then apply",
   "programs.apply": "Apply proposal",
-
   "dash.now": "Now",
   "dash.idle": "Idle — no irrigation running",
   "dash.running": "Irrigation in progress",
