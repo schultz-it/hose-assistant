@@ -137,5 +137,20 @@
   "dash.tomorrow": "Morgen",
   "dash.planned_runs": "geplante Läufe",
   "dash.reset_empty": "Speicher als leer markieren (erzwingt Bewässerung beim nächsten Plan)",
-  "dash.reset_empty_confirm": "Den Bodenspeicher als LEER markieren? Die Zone wird beim nächsten Plan bewässert"
+  "dash.reset_empty_confirm": "Den Bodenspeicher als LEER markieren? Die Zone wird beim nächsten Plan bewässert",
+  "dash.reservoir_info": "Wie wird das berechnet?",
+  "dash.detail_no_data": "Noch keine Berechnung — versuche Neu berechnen",
+  "dash.detail_et": "Wasserverlust (Verdunstung)",
+  "dash.detail_rain": "Regen",
+  "dash.detail_rain_effective": "wirksam",
+  "dash.detail_irrigated": "Heute bewässert",
+  "dash.detail_result": "Aktueller Speicher",
+  "dash.detail_date": "Stand",
+  "dash.history": "Verlauf",
+  "dash.history_irrigations": "Bewässerungsläufe",
+  "dash.history_empty": "Noch keine Läufe",
+  "dash.history_aborted": "unterbrochen",
+  "dash.history_skipped": "übersprungen",
+  "dash.history_rain": "Regen",
+  "dash.history_no_rain": "Kein Regen erfasst"
 }

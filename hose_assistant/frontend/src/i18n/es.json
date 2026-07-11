@@ -137,5 +137,20 @@
   "dash.tomorrow": "Mañana",
   "dash.planned_runs": "riegos planificados",
   "dash.reset_empty": "Marcar reserva como vacía (fuerza el riego en el próximo plan)",
-  "dash.reset_empty_confirm": "¿Marcar la reserva del suelo como VACÍA? La zona se regará en el próximo plan"
+  "dash.reset_empty_confirm": "¿Marcar la reserva del suelo como VACÍA? La zona se regará en el próximo plan",
+  "dash.reservoir_info": "¿Cómo se calcula esto?",
+  "dash.detail_no_data": "Aún no hay cálculo — prueba a recalcular",
+  "dash.detail_et": "Agua usada (evapotranspiración)",
+  "dash.detail_rain": "Lluvia",
+  "dash.detail_rain_effective": "efectiva",
+  "dash.detail_irrigated": "Regado hoy",
+  "dash.detail_result": "Reserva actual",
+  "dash.detail_date": "a fecha de",
+  "dash.history": "Historial",
+  "dash.history_irrigations": "Riegos",
+  "dash.history_empty": "Aún no hay riegos",
+  "dash.history_aborted": "interrumpido",
+  "dash.history_skipped": "omitido",
+  "dash.history_rain": "Lluvia",
+  "dash.history_no_rain": "Sin lluvia registrada"
 }

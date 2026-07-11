@@ -137,5 +137,20 @@
   "dash.tomorrow": "Domani",
   "dash.planned_runs": "corse pianificate",
   "dash.reset_empty": "Segna riserva vuota (forza l'irrigazione al prossimo piano)",
-  "dash.reset_empty_confirm": "Segnare la riserva del suolo come VUOTA? La zona verrà irrigata al prossimo piano"
+  "dash.reset_empty_confirm": "Segnare la riserva del suolo come VUOTA? La zona verrà irrigata al prossimo piano",
+  "dash.reservoir_info": "Come viene calcolato?",
+  "dash.detail_no_data": "Nessun calcolo ancora — prova a ricalcolare",
+  "dash.detail_et": "Acqua persa (evapotraspirazione)",
+  "dash.detail_rain": "Pioggia",
+  "dash.detail_rain_effective": "effettiva",
+  "dash.detail_irrigated": "Irrigato oggi",
+  "dash.detail_result": "Riserva attuale",
+  "dash.detail_date": "aggiornato al",
+  "dash.history": "Storico",
+  "dash.history_irrigations": "Irrigazioni",
+  "dash.history_empty": "Nessuna irrigazione ancora",
+  "dash.history_aborted": "interrotta",
+  "dash.history_skipped": "saltata",
+  "dash.history_rain": "Pioggia",
+  "dash.history_no_rain": "Nessuna pioggia registrata"
 }

@@ -26,14 +26,32 @@ const POLL_MS = 5000;
 export function Dashboard() {
   const [st, setSt] = useState(null);
   const [log, setLog] = useState([]);
+  const [history, setHistory] = useState({ irrigations: [], rain: [] });
   const [runZone, setRunZone] = useState({ id: "", minutes: 10 });
   const [msg, setMsg] = useState("");
+  const [openDetail, setOpenDetail] = useState(null);
+  const [detail, setDetail] = useState({});
   const timer = useRef(null);
 
   const refresh = () => {
     get("api/status").then(setSt).catch(() => {});
     get("api/log?limit=15").then(setLog).catch(() => {});
+    get("api/history?limit=30").then(setHistory).catch(() => {});
   };
+
+  async function toggleDetail(zoneId) {
+    if (openDetail === zoneId) {
+      setOpenDetail(null);
+      return;
+    }
+    setOpenDetail(zoneId);
+    try {
+      const d = await get(`api/zones/${zoneId}/reservoir_detail`);
+      setDetail((prev) => ({ ...prev, [zoneId]: d }));
+    } catch (e) {
+      setDetail((prev) => ({ ...prev, [zoneId]: null }));
+    }
+  }
 
   useEffect(() => {
     refresh();
@@ -111,6 +129,11 @@ export function Dashboard() {
                 <span>{z.name}</span>
                 <span class={`flex items-center gap-2 ${dry ? "text-amber-500" : "text-gray-500"}`}>
                   💧 {left.toFixed(1)}/{z.taw_mm} mm{dry ? ` · ${t("dash.dry")}` : ""}
+                  <button class="w-4 h-4 leading-4 rounded-full border border-gray-300 dark:border-gray-700 text-gray-400 hover:text-sky-500 hover:border-sky-500 text-[10px]"
+                    title={t("dash.reservoir_info")}
+                    onClick={() => toggleDetail(z.id)}>
+                    i
+                  </button>
                   <button class="text-[10px] px-1 rounded border border-gray-300 dark:border-gray-700 text-gray-400 hover:text-sky-500 hover:border-sky-500"
                     title={t("dash.reset_reservoir")}
                     onClick={() => {
@@ -133,6 +156,34 @@ export function Dashboard() {
                 <div class={`h-full ${dry ? "bg-amber-500" : "bg-sky-500"}`}
                   style={{ width: `${pct}%` }} />
               </div>
+              {openDetail === z.id && (
+                <div class="mt-1 mb-2 p-2 rounded bg-gray-100 dark:bg-gray-800 text-xs text-gray-600 dark:text-gray-300 space-y-0.5">
+                  {!detail[z.id] ? (
+                    <p>{t("common.loading")}</p>
+                  ) : detail[z.id].date == null ? (
+                    <p>{t("dash.detail_no_data")}</p>
+                  ) : (
+                    <>
+                      <p>
+                        {t("dash.detail_et")}: ET0 {detail[z.id].et0} mm × Kc {detail[z.id].kc_eff}
+                        {" × "}{detail[z.id].watering_intensity} × {detail[z.id].et_multiplier}
+                        {" ≈ "}{detail[z.id].et_loss_mm} mm
+                      </p>
+                      <p>
+                        {t("dash.detail_rain")}: {detail[z.id].rain_mm} mm
+                        {" ("}{t("dash.detail_rain_effective")}: {detail[z.id].effective_rain_mm} mm)
+                      </p>
+                      <p>{t("dash.detail_irrigated")}: {detail[z.id].irrigated_mm} mm</p>
+                      <p>
+                        {t("dash.detail_result")}:{" "}
+                        {Math.max(0, detail[z.id].taw_mm - detail[z.id].deficit_mm).toFixed(1)}
+                        /{detail[z.id].taw_mm} mm
+                        {" — "}{t("dash.detail_date")} {detail[z.id].date}
+                      </p>
+                    </>
+                  )}
+                </div>
+              )}
             </div>
           );
         })}
@@ -234,6 +285,48 @@ export function Dashboard() {
             </button>
           )}
         </div>
+      </Card>
+
+      <Card title={t("dash.history")}>
+        <h3 class="text-xs font-semibold uppercase text-gray-400 mb-1">
+          {t("dash.history_irrigations")}
+        </h3>
+        {history.irrigations.length === 0 && (
+          <p class="text-gray-500 text-sm mb-2">{t("dash.history_empty")}</p>
+        )}
+        <ul class="text-sm space-y-1 mb-3">
+          {history.irrigations.map((r) => (
+            <li key={r.id} class="flex items-center justify-between">
+              <span>
+                {r.status === "done" ? "💧" : r.status === "aborted" ? "⚠️" : "⏭️"}{" "}
+                {r.zone_name} — {whenLabel(r.start)}
+              </span>
+              <span class="text-gray-500 text-xs">
+                {r.status === "done"
+                  ? `${Math.round(r.duration_min)} ${t("common.minutes")}`
+                  : r.status === "aborted"
+                  ? t("dash.history_aborted")
+                  : t("dash.history_skipped")}
+              </span>
+            </li>
+          ))}
+        </ul>
+        <h3 class="text-xs font-semibold uppercase text-gray-400 mb-1">
+          {t("dash.history_rain")}
+        </h3>
+        {history.rain.length === 0 && (
+          <p class="text-gray-500 text-sm">{t("dash.history_no_rain")}</p>
+        )}
+        <ul class="text-sm space-y-1">
+          {history.rain.map((r) => (
+            <li key={r.date} class="flex items-center justify-between">
+              <span>
+                🌧️ {new Date(r.date).toLocaleDateString(getLocale(), { day: "numeric", month: "long" })}
+              </span>
+              <span class="text-gray-500 text-xs">{r.rain_mm} mm</span>
+            </li>
+          ))}
+        </ul>
       </Card>
 
       <Card title={t("dash.log")}>

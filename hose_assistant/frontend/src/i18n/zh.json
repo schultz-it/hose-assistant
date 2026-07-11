@@ -137,5 +137,20 @@
   "dash.tomorrow": "明天",
   "dash.planned_runs": "个已计划运行",
   "dash.reset_empty": "将储水标记为空（下次计划时强制浇水）",
-  "dash.reset_empty_confirm": "将土壤储水标记为空？该分区将在下次计划时浇水"
+  "dash.reset_empty_confirm": "将土壤储水标记为空？该分区将在下次计划时浇水",
+  "dash.reservoir_info": "这个数字是如何计算的？",
+  "dash.detail_no_data": "尚无计算数据 — 试试重新计算",
+  "dash.detail_et": "耗水量（蒸散量）",
+  "dash.detail_rain": "降雨",
+  "dash.detail_rain_effective": "有效",
+  "dash.detail_irrigated": "今日已灌溉",
+  "dash.detail_result": "当前储水量",
+  "dash.detail_date": "截至",
+  "dash.history": "历史记录",
+  "dash.history_irrigations": "灌溉记录",
+  "dash.history_empty": "暂无灌溉记录",
+  "dash.history_aborted": "已中断",
+  "dash.history_skipped": "已跳过",
+  "dash.history_rain": "降雨",
+  "dash.history_no_rain": "暂无降雨记录"
 }

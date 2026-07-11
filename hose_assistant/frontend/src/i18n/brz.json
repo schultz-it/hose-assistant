@@ -137,5 +137,20 @@
   "dash.tomorrow": "Doman",
   "dash.planned_runs": "gir in program",
   "dash.reset_empty": "Sègna la riserva vöja (la fa bagnà al pròssim pian)",
-  "dash.reset_empty_confirm": "Sègna l'aqua in de la tèra come VÖJA? La zòna la vegnarà bagnada al pròssim pian"
+  "dash.reset_empty_confirm": "Sègna l'aqua in de la tèra come VÖJA? La zòna la vegnarà bagnada al pròssim pian",
+  "dash.reservoir_info": "Comè che l'è cüntaa fò?",
+  "dash.detail_no_data": "Gh'è anmò nissün cünt — próva a cüntà de növ",
+  "dash.detail_et": "Aqua persa (evaporazión)",
+  "dash.detail_rain": "Piöva",
+  "dash.detail_rain_effective": "che la cünta",
+  "dash.detail_irrigated": "Bagnaa incö",
+  "dash.detail_result": "Riserva de adèss",
+  "dash.detail_date": "de dàta",
+  "dash.history": "Stòria",
+  "dash.history_irrigations": "Bagnadür fàcc",
+  "dash.history_empty": "Gh'è anmò nissüna bagnadüra",
+  "dash.history_aborted": "fermada a metà",
+  "dash.history_skipped": "saltada",
+  "dash.history_rain": "Piöva",
+  "dash.history_no_rain": "Gh'è nissüna piöva registrada"
 }

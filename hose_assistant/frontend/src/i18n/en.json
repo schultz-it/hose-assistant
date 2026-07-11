@@ -137,5 +137,20 @@
   "dash.tomorrow": "Tomorrow",
   "dash.planned_runs": "runs planned",
   "dash.reset_empty": "Mark reservoir as empty (forces watering at the next plan)",
-  "dash.reset_empty_confirm": "Mark the soil reservoir as EMPTY? The zone will be watered at the next plan"
+  "dash.reset_empty_confirm": "Mark the soil reservoir as EMPTY? The zone will be watered at the next plan",
+  "dash.reservoir_info": "How is this calculated?",
+  "dash.detail_no_data": "No calculation yet — try Recalculate",
+  "dash.detail_et": "Water used (evapotranspiration)",
+  "dash.detail_rain": "Rain",
+  "dash.detail_rain_effective": "effective",
+  "dash.detail_irrigated": "Irrigated today",
+  "dash.detail_result": "Current reserve",
+  "dash.detail_date": "as of",
+  "dash.history": "History",
+  "dash.history_irrigations": "Irrigation runs",
+  "dash.history_empty": "No runs yet",
+  "dash.history_aborted": "interrupted",
+  "dash.history_skipped": "skipped",
+  "dash.history_rain": "Rain",
+  "dash.history_no_rain": "No rain recorded"
 }

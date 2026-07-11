@@ -137,5 +137,20 @@
   "dash.tomorrow": "Demain",
   "dash.planned_runs": "arrosages prévus",
   "dash.reset_empty": "Marquer le réservoir comme vide (force l'arrosage au prochain plan)",
-  "dash.reset_empty_confirm": "Marquer le réservoir du sol comme VIDE ? La zone sera arrosée au prochain plan"
+  "dash.reset_empty_confirm": "Marquer le réservoir du sol comme VIDE ? La zone sera arrosée au prochain plan",
+  "dash.reservoir_info": "Comment ce chiffre est-il calculé ?",
+  "dash.detail_no_data": "Aucun calcul pour l'instant — essayez de recalculer",
+  "dash.detail_et": "Eau perdue (évapotranspiration)",
+  "dash.detail_rain": "Pluie",
+  "dash.detail_rain_effective": "efficace",
+  "dash.detail_irrigated": "Arrosé aujourd'hui",
+  "dash.detail_result": "Réserve actuelle",
+  "dash.detail_date": "au",
+  "dash.history": "Historique",
+  "dash.history_irrigations": "Arrosages",
+  "dash.history_empty": "Aucun arrosage pour l'instant",
+  "dash.history_aborted": "interrompu",
+  "dash.history_skipped": "ignoré",
+  "dash.history_rain": "Pluie",
+  "dash.history_no_rain": "Aucune pluie enregistrée"
 }

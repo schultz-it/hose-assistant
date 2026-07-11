@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.2.8
+- Dashboard: an "i" info button next to each zone's soil reservoir reading
+  opens a breakdown of the calculation behind that number — water lost to
+  evapotranspiration (ET0 × Kc × intensity × program multiplier), rain
+  (raw and effective, after infiltration cap and cover), water irrigated
+  today, and the resulting reserve, with the date it was last computed.
+- Dashboard: a new "History" card lists past irrigation runs (per zone,
+  with duration or why they didn't run) and recorded rain days, so you can
+  check what actually happened without digging through the raw event log.
+- New endpoints: `GET /api/zones/{id}/reservoir_detail`, `GET /api/history`.
+- Translated to all 10 supported languages.
+
 ## 1.2.7
 - Fix: after updating the add-on, some phones/browsers kept showing the
   OLD web UI (e.g. 1.2.6's new button appeared missing) even though the

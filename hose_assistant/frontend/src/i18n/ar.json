@@ -137,5 +137,20 @@
   "dash.tomorrow": "غدًا",
   "dash.planned_runs": "عمليات مجدولة",
   "dash.reset_empty": "وضع علامة أن المخزون فارغ (يفرض الري في الخطة القادمة)",
-  "dash.reset_empty_confirm": "وضع علامة أن مخزون التربة فارغ؟ ستُروى المنطقة في الخطة القادمة"
+  "dash.reset_empty_confirm": "وضع علامة أن مخزون التربة فارغ؟ ستُروى المنطقة في الخطة القادمة",
+  "dash.reservoir_info": "كيف يتم حساب هذا الرقم؟",
+  "dash.detail_no_data": "لا يوجد حساب بعد — جرّب إعادة الحساب",
+  "dash.detail_et": "الماء المستهلك (النتح التبخري)",
+  "dash.detail_rain": "المطر",
+  "dash.detail_rain_effective": "الفعلي",
+  "dash.detail_irrigated": "تم الري اليوم",
+  "dash.detail_result": "المخزون الحالي",
+  "dash.detail_date": "حتى تاريخ",
+  "dash.history": "السجل",
+  "dash.history_irrigations": "عمليات الري",
+  "dash.history_empty": "لا توجد عمليات ري بعد",
+  "dash.history_aborted": "متوقفة",
+  "dash.history_skipped": "متخطاة",
+  "dash.history_rain": "المطر",
+  "dash.history_no_rain": "لم يُسجَّل أي مطر"
 }

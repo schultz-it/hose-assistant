@@ -137,5 +137,20 @@
   "dash.tomorrow": "明日",
   "dash.planned_runs": "件の予定運転",
   "dash.reset_empty": "貯水を空にする（次回計画で必ず灌水します）",
-  "dash.reset_empty_confirm": "土壌の貯水を空として記録しますか？次回計画でこのゾーンに灌水します"
+  "dash.reset_empty_confirm": "土壌の貯水を空として記録しますか？次回計画でこのゾーンに灌水します",
+  "dash.reservoir_info": "この数値はどう計算されていますか？",
+  "dash.detail_no_data": "まだ計算されていません — 再計算をお試しください",
+  "dash.detail_et": "消費水量(蒸発散量)",
+  "dash.detail_rain": "降雨",
+  "dash.detail_rain_effective": "有効",
+  "dash.detail_irrigated": "本日の灌水量",
+  "dash.detail_result": "現在の貯水量",
+  "dash.detail_date": "時点",
+  "dash.history": "履歴",
+  "dash.history_irrigations": "灌水履歴",
+  "dash.history_empty": "まだ灌水記録がありません",
+  "dash.history_aborted": "中断",
+  "dash.history_skipped": "スキップ",
+  "dash.history_rain": "降雨",
+  "dash.history_no_rain": "降雨の記録なし"
 }

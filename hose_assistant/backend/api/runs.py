@@ -3,13 +3,13 @@ from datetime import date, datetime
 
 import httpx
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from .. import models
 from ..core import engine as eng
+from ..core import kc, soil
 from ..core import scheduler as sched
-from ..core import soil
 from ..core.executor import executor
 from ..db import get_db
 from .config import ensure_config
@@ -166,6 +166,78 @@ def reset_reservoir(zone_id: int,
     db.commit()
     return {"zone_id": zone_id, "state": state,
             "deficit_mm": eng.current_deficit(db, zone_id)}
+
+
+@router.get("/zones/{zone_id}/reservoir_detail")
+def reservoir_detail(zone_id: int, db: Session = Depends(get_db)) -> dict:
+    """Breakdown of the latest balance row behind the dashboard's mm figure.
+
+    Same terms as engine.update_deficits, surfaced read-only for the
+    dashboard's "how is this calculated" info popup.
+    """
+    zone = db.get(models.Zone, zone_id)
+    if zone is None:
+        raise HTTPException(status_code=404, detail="Zone not found")
+    cfg = ensure_config(db)
+    taw = soil.taw_mm(zone)
+    infil = soil.infiltration_mmh(zone.soil_type)
+    row = db.scalar(
+        select(models.WaterBalance)
+        .where(models.WaterBalance.zone_id == zone_id)
+        .order_by(models.WaterBalance.date.desc())
+    )
+    if row is None:
+        return {"zone_id": zone_id, "date": None, "taw_mm": round(taw, 1)}
+    program = eng.active_program(db, date.today())
+    et_mult = program.et_multiplier if program else 1.0
+    et0 = row.et0 or 0.0
+    kc_eff = row.kc_eff or 0.0
+    rain_mm = row.rain_mm or 0.0
+    irrigated_mm = row.irrigated_mm or 0.0
+    cover_factor = kc.cover_rain_factor(zone)
+    eff_rain = round(min(rain_mm, infil) * cover_factor, 2)
+    et_loss = round(et0 * kc_eff * cfg.watering_intensity * et_mult, 2)
+    return {
+        "zone_id": zone_id, "date": row.date, "taw_mm": round(taw, 1),
+        "deficit_mm": round(row.deficit_mm or 0.0, 1),
+        "et0": round(et0, 2), "kc_eff": round(kc_eff, 3),
+        "watering_intensity": cfg.watering_intensity, "et_multiplier": et_mult,
+        "et_loss_mm": et_loss,
+        "rain_mm": round(rain_mm, 1), "cover_rain_factor": cover_factor,
+        "infiltration_cap_mmh": infil, "effective_rain_mm": eff_rain,
+        "irrigated_mm": round(irrigated_mm, 2),
+    }
+
+
+@router.get("/history")
+def get_history(limit: int = 30, db: Session = Depends(get_db)) -> dict:
+    """Irrigation runs + rain days, most recent first (dashboard history list)."""
+    zone_names = {z.id: z.name for z in db.scalars(select(models.Zone)).all()}
+    runs = db.scalars(
+        select(models.Schedule)
+        .where(models.Schedule.status.in_(["done", "aborted", "skipped"]))
+        .order_by(models.Schedule.start.desc())
+        .limit(limit)
+    ).all()
+    rain_rows = db.execute(
+        select(models.WaterBalance.date, func.max(models.WaterBalance.rain_mm))
+        .group_by(models.WaterBalance.date)
+        .order_by(models.WaterBalance.date.desc())
+        .limit(limit)
+    ).all()
+    return {
+        "irrigations": [
+            {"id": r.id, "zone_id": r.zone_id,
+             "zone_name": zone_names.get(r.zone_id, f"#{r.zone_id}"),
+             "start": r.start.isoformat() if r.start else None,
+             "duration_min": r.duration_min, "status": r.status,
+             "skip_reason": r.skip_reason}
+            for r in runs
+        ],
+        "rain": [
+            {"date": d, "rain_mm": round(mm, 1)} for d, mm in rain_rows if mm and mm > 0
+        ],
+    }
 
 
 @router.post("/stop_all")
