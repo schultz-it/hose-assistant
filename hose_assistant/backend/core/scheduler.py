@@ -104,7 +104,20 @@ async def run_recalc(db: Session, cfg: models.SystemConfig) -> list[models.Sched
             eng.log_event(db, "warning",
                           f"Weather entity {cfg.weather_entity} unreadable "
                           f"({exc!r}); using Open-Meteo forecast")
-    eng.fill_balance(db, [d for d in daily if d["date"] < today_iso])
+    balance_days = [d for d in daily if d["date"] < today_iso]
+    # Today gets a PARTIAL row — rain actually fallen and ET0 accumulated so
+    # far (hourly sums) — so the reservoir reflects rain as it happens.
+    # Recomputed on every recalc; tomorrow the full-day actual replaces it.
+    # Best-effort: without it the balance is simply as of yesterday (the
+    # pre-1.3.1 behaviour), which planning already tolerates.
+    try:
+        so_far = await weather.fetch_today_so_far(cfg.latitude, cfg.longitude)
+        balance_days.append({"date": today_iso, **so_far})
+    except Exception as exc:  # noqa: BLE001
+        eng.log_event(db, "warning",
+                      f"Today's partial rain/ET0 unavailable ({exc}); "
+                      f"balance is as of yesterday")
+    eng.fill_balance(db, balance_days)
     eng.update_deficits(db, cfg)
     # Drop stale planned rows, then re-plan from scratch.
     for row in db.scalars(

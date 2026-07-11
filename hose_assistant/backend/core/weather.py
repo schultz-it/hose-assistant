@@ -61,6 +61,38 @@ async def fetch_daily(lat: float, lon: float, *, past_days: int = 7,
     ]
 
 
+async def fetch_today_so_far(lat: float, lon: float) -> dict:
+    """Rain fallen and ET0 accumulated TODAY, up to the current hour.
+
+    Sums Open-Meteo's hourly series for the current day. Used to give the
+    water balance a partial row for today, so rain that just fell shows up
+    in the soil reservoir immediately instead of only at tomorrow's daily
+    calc (the daily ``precipitation_sum`` for today is a full-day forecast,
+    not what has actually fallen).
+    """
+    from datetime import datetime
+
+    params = {
+        "latitude": lat,
+        "longitude": lon,
+        "hourly": "precipitation,et0_fao_evapotranspiration",
+        "forecast_days": 1,
+        "timezone": "auto",
+    }
+    async with httpx.AsyncClient(timeout=TIMEOUT) as client:
+        resp = await client.get(FORECAST_URL, params=params)
+    resp.raise_for_status()
+    hourly = resp.json()["hourly"]
+    now = datetime.now()
+    rain = et0 = 0.0
+    for t, p, e in zip(hourly["time"], hourly["precipitation"],
+                       hourly["et0_fao_evapotranspiration"]):
+        if datetime.fromisoformat(t) <= now:
+            rain += p or 0.0
+            et0 += e or 0.0
+    return {"rain_mm": round(rain, 2), "et0": round(et0, 3)}
+
+
 async def fetch_current(lat: float, lon: float) -> dict:
     """Real-time-ish current conditions (Open-Meteo's model, refreshed hourly).
 

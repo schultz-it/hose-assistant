@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.3.1
+- Fix: rain that fell TODAY did not show in the soil reservoir (the info
+  panel said "rain 0 mm" right after a rainstorm). The water balance only
+  included fully completed days, so today's rain was counted only at the
+  next day's calculation. Now every recalculation also writes a partial
+  row for today using hourly data (rain actually fallen and ET0
+  accumulated up to the current hour), so the reservoir fills as it rains;
+  the final full-day value replaces the partial one at tomorrow's daily
+  calc. Refreshed hourly (or on manual Recalculate).
+
 ## 1.3.0
 - New **Weather** tab: current conditions read from your configured HA
   weather entity if you have one (e.g. a real local station), falling back
