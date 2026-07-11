@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.2.4
+- Fix: event log timestamps were still 2h behind even after 1.2.3's clock
+  fix, because they were generated with an explicit `datetime.utcnow()`
+  (always UTC) instead of the corrected local clock. The event log now uses
+  the same (corrected) local time as everything else in the app — this was
+  a display-only bug, independent from the scheduling-clock fix in 1.2.2/
+  1.2.3.
+- To check the scheduling clock itself is correct on your install: open
+  Setup — the "Timezone" field should read your real zone (e.g.
+  "Europe/Rome"), and the event log's first entry after a restart should
+  say "Startup timezone: <zone> ... (source: HA Core API)".
+
 ## 1.2.3
 - Fix: the 1.2.2 timezone fix (shell-level `bashio::info.timezone`) wasn't
   enough — clocks were still 2h behind for some installs. Added a second,

@@ -135,7 +135,10 @@ class EventLog(Base):
     __tablename__ = "event_log"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    ts: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
+    # datetime.now (process-local, corrected to HA's timezone at startup —
+    # see main.py) — NOT utcnow: the frontend parses this naive ISO string
+    # as local time (no offset suffix), so it must actually BE local time.
+    ts: Mapped[datetime] = mapped_column(DateTime, default=datetime.now, index=True)
     level: Mapped[str] = mapped_column(String, default="info")
     message: Mapped[str] = mapped_column(String)
     meta: Mapped[dict | None] = mapped_column(JSON, nullable=True)
