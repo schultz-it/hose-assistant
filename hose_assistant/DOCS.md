@@ -49,7 +49,7 @@ everything; zones run strictly one at a time.
 | Skip if rain forecast ≥ mm/24h | Skips all runs if that much rain is coming. | 5 mm default. Lower it if your soil holds water well. |
 | Skip spray zones if wind ≥ km/h | Wind blows spray away; drip is unaffected. | 20–30 km/h is a sensible threshold. Empty = disabled. |
 | HA weather entity | Overrides the **forecast** rain with your own integration (past actuals stay Open-Meteo). | Press **Test** to see exactly what the engine will read. |
-| Expose entities | Publishes sensors/switch/number back into HA (section 6). | |
+| Expose entities | Publishes sensors/switch/number back into HA (section 7). | |
 
 ---
 
@@ -167,15 +167,46 @@ the valves.**
 - **Now** — running/idle status and the active program.
 - **Watering intensity** — global 0.5×–2× multiplier applied live (holiday
   coming? drop it to 0.7; heatwave? raise it).
-- **Soil reservoir** — per-zone deficit vs the dry threshold.
+- **Soil reservoir** — per-zone deficit vs the dry threshold, auto-refreshed
+  hourly. Tap the **ⓘ** next to a zone for a full breakdown of the number
+  (ET loss, rain vs. effective rain, irrigation applied, last-updated date).
+  The **100%** / **0%** buttons manually mark a zone's reservoir full or
+  empty (e.g. after hand-watering, or to force a watering next run).
 - **Upcoming runs** — skip (✕) or override the duration (✎) of any run.
+- **History** — past irrigation runs per zone (with duration, or why one
+  didn't run) and recorded rain days, so you can check what actually
+  happened without digging through the raw event log.
 - **Controls** — run a single zone, recalculate the plan, **STOP ALL**
   (panic button: closes everything immediately), System ON/OFF (OFF also
   stops the current run), rain delay 24/48/72 h.
 
 ---
 
-## 6. Exposing entities to Home Assistant
+## 6. Weather tab
+
+Real-time conditions and the forecast the engine itself is planning around:
+
+- **Current conditions** — read from your configured HA **weather entity**
+  if you have one (e.g. a real local weather station integration), so the
+  numbers reflect your actual garden rather than the nearest regional grid
+  point. Without one, it falls back to Open-Meteo's current conditions for
+  your coordinates (still keyless, no API key needed).
+- **Rain skip** — a clear green/red status telling you whether irrigation
+  will run or be skipped today because of forecast rain, plus the exact
+  forecast total and your configured threshold (Setup → *Skip if rain
+  forecast ≥*). This is the same 24h-ahead number the engine itself checks
+  before planning — if it says SKIPPED, nothing will run today for that
+  reason.
+- **Wind skip** — same idea, but for the wind threshold (Setup → *Skip
+  spray zones if wind ≥*). Only spray-type zones are ever skipped for
+  wind — drip and micro-spray zones are unaffected, since wind doesn't
+  blow their output off target. Shows as disabled if no threshold is set.
+- **Forecast** — the next days' expected rain and ET0, the same data feeding
+  tomorrow's plan.
+
+---
+
+## 7. Exposing entities to Home Assistant
 
 Enable **Expose entities** in Setup. Within a minute you get, grouped under
 one *Hose Assistant* device:
@@ -196,7 +227,7 @@ coming*: trigger on `sensor.hose_assistant_zone_1_deficit` above 15.
 
 ---
 
-## 7. Add-on options
+## 8. Add-on options
 
 | Option | Default | Meaning |
 |---|---|---|
@@ -205,7 +236,7 @@ coming*: trigger on `sensor.hose_assistant_zone_1_deficit` above 15.
 
 ---
 
-## 8. FAQ & troubleshooting
+## 9. FAQ & troubleshooting
 
 **The panel shows "Location not configured".** Set latitude/longitude in
 Setup first — everything depends on it.
@@ -229,7 +260,7 @@ then toggle Expose entities off/on. Check the add-on log.
 entities: full engine + executor behaviour, zero water. Swap in the real
 `switch.*` entities only when you trust the schedule.
 
-## 9. Privacy
+## 10. Privacy
 
 Only your latitude/longitude are sent to Open-Meteo (weather, no account).
 If — and only if — you invoke the AI features, your irrigation configuration

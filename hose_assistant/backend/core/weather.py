@@ -59,3 +59,53 @@ async def fetch_daily(lat: float, lon: float, *, past_days: int = 7,
             daily["windspeed_10m_max"],
         )
     ]
+
+
+async def fetch_current(lat: float, lon: float) -> dict:
+    """Real-time-ish current conditions (Open-Meteo's model, refreshed hourly).
+
+    This is the regional-fallback source for the Weather tab when no HA
+    weather entity (e.g. a real local station) is configured.
+    """
+    params = {
+        "latitude": lat,
+        "longitude": lon,
+        "current": "temperature_2m,relative_humidity_2m,precipitation,"
+                   "weather_code,wind_speed_10m,is_day",
+        "timezone": "auto",
+    }
+    async with httpx.AsyncClient(timeout=TIMEOUT) as client:
+        resp = await client.get(FORECAST_URL, params=params)
+    resp.raise_for_status()
+    c = resp.json()["current"]
+    return {
+        "temperature_c": c.get("temperature_2m"),
+        "humidity_pct": c.get("relative_humidity_2m"),
+        "precipitation_mm": c.get("precipitation"),
+        "wind_kmh": c.get("wind_speed_10m"),
+        "weather_code": c.get("weather_code"),
+        "is_day": c.get("is_day"),
+        "time": c.get("time"),
+    }
+
+
+# WMO weather codes (https://open-meteo.com/en/docs) mapped onto the same
+# condition vocabulary Home Assistant weather entities use, so the frontend
+# needs only one icon/label lookup regardless of the data source.
+_WMO_CONDITION = {
+    0: "sunny", 1: "partlycloudy", 2: "partlycloudy", 3: "cloudy",
+    45: "fog", 48: "fog",
+    51: "rainy", 53: "rainy", 55: "rainy", 56: "rainy", 57: "rainy",
+    61: "rainy", 63: "rainy", 65: "pouring",
+    66: "snowy-rainy", 67: "snowy-rainy",
+    71: "snowy", 73: "snowy", 75: "snowy", 77: "snowy",
+    80: "rainy", 81: "pouring", 82: "pouring",
+    85: "snowy", 86: "snowy",
+    95: "lightning-rainy", 96: "lightning-rainy", 99: "lightning-rainy",
+}
+
+
+def condition_from_wmo(code: int | None, is_day: int | None = 1) -> str:
+    if code == 0 and not is_day:
+        return "clear-night"
+    return _WMO_CONDITION.get(code, "cloudy")

@@ -5,11 +5,13 @@ import { Setup } from "./tabs/Setup.jsx";
 import { Zones } from "./tabs/Zones.jsx";
 import { Programs } from "./tabs/Programs.jsx";
 import { Dashboard } from "./tabs/Dashboard.jsx";
+import { Weather } from "./tabs/Weather.jsx";
 
 const TABS = [
   { id: "dashboard", label: "tabs.dashboard", icon: "📊" },
   { id: "zones", label: "tabs.zones", icon: "💧" },
   { id: "programs", label: "tabs.programs", icon: "🗓️" },
+  { id: "weather", label: "tabs.weather", icon: "⛅" },
   { id: "setup", label: "tabs.setup", icon: "⚙️" },
 ];
 
@@ -40,6 +42,7 @@ export function App() {
         {tab === "dashboard" && <Dashboard />}
         {tab === "zones" && <Zones />}
         {tab === "programs" && <Programs />}
+        {tab === "weather" && <Weather />}
         {tab === "setup" && <Setup />}
       </main>
 

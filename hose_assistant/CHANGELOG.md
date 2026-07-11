@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.3.0
+- New **Weather** tab: current conditions read from your configured HA
+  weather entity if you have one (e.g. a real local station), falling back
+  to Open-Meteo's regional data when you don't — plus a 7-day forecast.
+- The tab makes it unambiguous whether irrigation will run today: a
+  dedicated, color-coded **rain skip** status shows the exact forecast
+  total next to your configured threshold, and a separate **wind skip**
+  status does the same for spray zones (drip/micro-spray are never
+  affected by wind, and it says so).
+- New endpoint: `GET /api/weather/now`.
+- README updated with the full current feature set (backup/restore,
+  reservoir reset, calculation breakdown, history, and the 10 supported
+  languages including the just-for-fun Brianza-dialect translation).
+
 ## 1.2.8
 - Dashboard: an "i" info button next to each zone's soil reservoir reading
   opens a breakdown of the calculation behind that number — water lost to

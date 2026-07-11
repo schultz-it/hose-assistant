@@ -18,13 +18,17 @@ Click the badge above, or manually:
 
 ## Features
 
-- Water-balance engine: ET₀ × crop coefficient × shade − rain, per zone
+- Water-balance engine: ET₀ × crop coefficient × shade − rain, per zone, with a one-tap breakdown of the math behind every reservoir reading
 - Unlimited zones: spray/rotor/MP/drip, soil & grass types, slope with cycle & soak, monthly shade profiles
 - 4 seasonal programs (Lawn Start, Spring, Summer, Autumn) — auto-generated from your local climate, or by AI
+- Live Weather tab: current conditions from your own HA weather station if you have one (else a regional Open-Meteo fallback), a 7-day forecast, and a clear, dedicated indicator for when rain or wind is about to skip irrigation
 - Forecast rain skip, soil-moisture & rain-sensor skip, wind skip, rain delay, global intensity slider
+- History of past irrigation runs and recorded rain, and a manual reservoir reset (full or empty) per zone
+- Backup & restore of all settings and history to a single JSON file
 - Hard hardware failsafes on every valve actuation
 - Optional native HA entities via MQTT discovery
-- UI in 9 languages (EN, IT, FR, DE, ES, PT, ZH, JA, AR incl. right-to-left); docs in English; fully translatable (i18n)
+- Automated dependency & security update monitoring (Dependabot + GitHub security alerts)
+- UI in 10 languages: EN, IT, FR, DE, ES, PT, ZH, JA, AR (right-to-left), plus a just-for-fun Brianza-dialect translation (`brz`); docs in English; fully translatable (i18n)
 
 ## License
 

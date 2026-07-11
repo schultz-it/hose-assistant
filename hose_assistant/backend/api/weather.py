@@ -9,7 +9,7 @@ Deficit computation and scheduling belong to the engine (Milestone 4); here
 the balance rows are filled with the weather inputs (et0, rain, kc_eff).
 """
 import os
-from datetime import date
+from datetime import date, datetime
 
 import httpx
 from fastapi import APIRouter, Depends, HTTPException
@@ -87,6 +87,101 @@ async def weather_entity_test(db: Session = Depends(get_db)) -> dict:
         "daily_rain_mm": rain,
         "note": "These values override the Open-Meteo FORECAST rain in the "
                 "daily calculation (past actuals stay Open-Meteo).",
+    }
+
+
+def _to_kmh(value: float | None, unit: str | None) -> float | None:
+    if value is None:
+        return None
+    if unit in ("mph",):
+        return round(value * 1.60934, 1)
+    if unit in ("m/s",):
+        return round(value * 3.6, 1)
+    return round(value, 1)  # already km/h, or an unknown unit shown as-is
+
+
+def _to_celsius(value: float | None, unit: str | None) -> float | None:
+    if value is None:
+        return None
+    if unit in ("°F", "F"):
+        return round((value - 32) * 5.0 / 9.0, 1)
+    return round(value, 1)
+
+
+@router.get("/weather/now")
+async def weather_now(db: Session = Depends(get_db)) -> dict:
+    """Current conditions (local HA station if configured, else Open-Meteo),
+    the forecast, and whether rain/wind would skip irrigation right now —
+    the same thresholds the engine itself uses (SPEC 6.2/6.3).
+    """
+    cfg = ensure_config(db)
+    lat, lon = _require_location(cfg)
+    try:
+        daily = await weather.fetch_daily(lat, lon)
+    except httpx.HTTPError as exc:
+        raise HTTPException(status_code=502, detail=f"Open-Meteo unreachable: {exc}")
+
+    today_iso = date.today().isoformat()
+    if cfg.weather_entity:
+        try:
+            ha_rain = await ha_client.get_weather_daily_rain(cfg.weather_entity)
+            daily = eng.merge_forecast_rain(daily, ha_rain, today_iso)
+        except Exception:  # noqa: BLE001 — best-effort, same as run_recalc
+            pass
+
+    # Same 24h-ahead window the engine checks before skipping a run.
+    next24 = [d for d in daily if d["date"] >= today_iso][:2]
+    rain_24h = round(sum(d["rain_mm"] or 0.0 for d in next24), 1)
+    wind_max = round(max((d.get("wind_kmh") or 0.0 for d in next24), default=0.0), 1)
+
+    current = None
+    source = "open_meteo"
+    entity_id = None
+    if cfg.weather_entity:
+        try:
+            state = await ha_client.get_state(cfg.weather_entity)
+        except Exception:  # noqa: BLE001
+            state = None
+        if state and state.get("state") not in (None, "unknown", "unavailable"):
+            attrs = state.get("attributes", {})
+            current = {
+                "condition": state.get("state"),
+                "temperature_c": _to_celsius(attrs.get("temperature"), attrs.get("temperature_unit")),
+                "humidity_pct": attrs.get("humidity"),
+                "wind_kmh": _to_kmh(attrs.get("wind_speed"), attrs.get("wind_speed_unit")),
+            }
+            source = "ha_entity"
+            entity_id = cfg.weather_entity
+    if current is None:
+        try:
+            c = await weather.fetch_current(lat, lon)
+            current = {
+                "condition": weather.condition_from_wmo(c["weather_code"], c["is_day"]),
+                "temperature_c": c["temperature_c"],
+                "humidity_pct": c["humidity_pct"],
+                "wind_kmh": c["wind_kmh"],
+            }
+        except httpx.HTTPError:
+            current = {"condition": None, "temperature_c": None,
+                      "humidity_pct": None, "wind_kmh": None}
+
+    return {
+        "source": source,
+        "entity": entity_id,
+        "current": current,
+        "updated": datetime.now().isoformat(timespec="seconds"),
+        "forecast": [{**d, "is_forecast": d["date"] >= today_iso} for d in daily],
+        "rain_skip": {
+            "threshold_mm": cfg.forecast_rain_skip_mm,
+            "rain_24h_mm": rain_24h,
+            "triggered": rain_24h >= cfg.forecast_rain_skip_mm,
+        },
+        "wind_skip": {
+            "enabled": cfg.wind_skip_kmh is not None,
+            "threshold_kmh": cfg.wind_skip_kmh,
+            "wind_max_kmh": wind_max,
+            "triggered": bool(cfg.wind_skip_kmh) and wind_max >= cfg.wind_skip_kmh,
+        },
     }
 
 
