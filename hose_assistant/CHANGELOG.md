@@ -5,6 +5,9 @@
   FastAPI, uvicorn, httpx, APScheduler and paho-mqtt; updated frontend build
   tooling that clears all open security advisories (build-time only);
   `actions/checkout` v7 in CI.
+- Frontend build upgraded from Vite 6 to Vite 8 (Rolldown). Rebuilding the UI
+  now needs Node 20.19+ or 22.12+; the build's default browser baseline is
+  Chrome/Edge 111, Firefox 114, Safari 16.4.
 
 ## 1.3.2
 - New Setup option: **Local rain sensor** — point it at your own station's
