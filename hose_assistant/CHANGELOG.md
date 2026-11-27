@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+- Dependency maintenance, no functional changes: newer minimum versions for
+  FastAPI, uvicorn, httpx, APScheduler and paho-mqtt; updated frontend build
+  tooling that clears all open security advisories (build-time only);
+  `actions/checkout` v7 in CI.
+
 ## 1.3.2
 - New Setup option: **Local rain sensor** — point it at your own station's
   daily-rain sensor (e.g. an Ecowitt/Netatmo "rain today" entity) and
